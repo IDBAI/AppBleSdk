@@ -60,8 +60,8 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     private static final int MSG_BELOW_LOLLIPOP_RECONNECT_LAST_DEVICE = 200;
     //
     private static final int RETRY_READ_RSSI_MAX = 3;//读远程RSSI，最大重试次数
-    private static final int RETRY_CONNECT_MAX = 1;//connectGatt 直接重连，可尝试最大次数
-    private static final int RETRY_NEW_GATT_CONNECT_MAX = 6;//新建Gatt 重连，可尝试最大次数
+    private static final int RETRY_CONNECT_MAX = 3;//connectGatt 直接重连，可尝试最大次数
+    private static final int RETRY_NEW_GATT_CONNECT_MAX = 9;//新建Gatt 重连，可尝试最大次数
     private static final int LOGIC_FAILED_RETRY_MAX = 3;//写入数据逻辑失败，可尝试最大次数
     private static final int RETRY_DISCOVER_SERVICE_MAX = 3;//发现服务超时，最大可尝试次数
     //
@@ -71,8 +71,8 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     private static final long DISCONNECT_INVAL = 500L;//断开间隔
     private static final int RE_DISCOVER_SERVICE_MAX = 3;//connectGatt.discoverServices() 为false时候，重试最大次数
     public static GattStatusEnum currentGattStatus = GATT_STATUS_DISCONNECTED;
-    public static boolean isReceiveNotify = false;
-    public static boolean isFinishSendData = false;
+    public static volatile boolean isReceiveNotify = false;
+    public static volatile boolean isFinishSendData = false;
     //写队列
     public static volatile boolean isWritting = false;
     //
@@ -119,7 +119,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         String manufacturer = Build.MANUFACTURER;
         if (manufacturer.equals("samsung")) {//三星
             XLog.d(TAG, "针对三星修改了超时配置");
-            GATT_FIRST_CONNECT_TIMEOUT = 3000L;//首次进来连接超时
+            GATT_FIRST_CONNECT_TIMEOUT = 3600L;//首次进来连接超时
             GATT_RECONNECT_TIMEOUT = 2000L;//connectGatt 直接重连超时
             NEW_GATT_CONNECT_TIMEOUT = 2000L;//新建Gatt 重连超时
             WAIT_SERVICE_DISCOVER_TIMEOUT = 2500L;//连接成功 超时没有回调发现服务 ->重新发现服务,最多 RETRY_DISCOVER_SERVICE_MAX 次 -> 断开重连
@@ -706,7 +706,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         XLog.d(TAG, "onCharacteristicWrite() called with: connectGatt = [" + connectGatt + "], characteristic = [" + characteristic + "], status = [" + status + "]");
         String desUuid = characteristic.getUuid().toString();
         String hexStr = ConvertUtil.byte2HexStr(characteristic.getValue());
-        XLog.d("GOOD", "onCharacteristicWrite() -> desUuid = " + desUuid + "\n" +
+        XLog.d("show-timeout", "onCharacteristicWrite() -> desUuid = " + desUuid + "\n" +
                 " hexStr = " + hexStr);
         if (status == BluetoothGatt.GATT_SUCCESS) {
             retry_logic_fail = 0;
@@ -735,6 +735,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             String hexStr = ConvertUtil.byte2HexStr(value);
             String string = "onCharacteristicChanged -> charUuid = " + characteristic.getUuid().toString() + "   receive:" + hexStr;
             XLog.d(TAG, string);
+            XLog.d("show-timeout", string);
             NotifyHelper.getInstance().debuginfo(string);
             GattOperations.dealNotify(connectGatt, value, listener);
         }
@@ -847,6 +848,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
      * 断开连接，在onConnectFailed 中close 资源
      */
     public void setTimeoutToStop() {
+        reMoveAllMsgForTimeout();
         if (isReceiveNotify) {
             XLog.d("timeout", "isReceiveNotify is true,return.");
             return;

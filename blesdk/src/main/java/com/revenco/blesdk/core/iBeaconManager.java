@@ -27,9 +27,9 @@ public class iBeaconManager implements BluetoothExceptionListener {
     private static final String TAG = "iBeaconManager";
     private static final int MSG_EXCEPTION = 2001;
     /**
-     * 每一次扫描周期
+     * 每一次扫描周期 3.5 秒扫描不到信号，返回超时失败
      */
-    private static final long SCAN_PERIOD = 2000;
+    private static final long SCAN_PERIOD = 3500;
     /**
      * 超时
      */

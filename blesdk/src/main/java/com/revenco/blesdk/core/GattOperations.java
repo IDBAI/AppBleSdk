@@ -5,7 +5,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 
 import com.revenco.blesdk.interfaces.oniBeaconStatusListener;
-import com.revenco.commonlibrary.log.XLog;
+import com.revenco.blesdk.utils.XLog;
 
 import static com.revenco.blesdk.callback.BleConnectGattCallback.isReceiveNotify;
 

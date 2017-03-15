@@ -1,10 +1,6 @@
 package com.revenco.blesdk.utils;
 
-import android.content.Context;
-import android.os.Build;
-
 import java.math.BigDecimal;
-import java.util.ArrayList;
 
 public class Tools {
     /**

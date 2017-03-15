@@ -9,7 +9,7 @@ import android.os.Build;
 import com.revenco.blesdk.callback.BleConnectGattCallback;
 import com.revenco.blesdk.callback.CallbackConnectHelper;
 import com.revenco.blesdk.utils.ConvertUtil;
-import com.revenco.commonlibrary.log.XLog;
+import com.revenco.blesdk.utils.XLog;
 
 import java.util.ArrayList;
 import java.util.HashMap;

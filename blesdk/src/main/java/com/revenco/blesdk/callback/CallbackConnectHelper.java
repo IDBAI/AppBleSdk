@@ -14,7 +14,7 @@ import com.revenco.blesdk.interfaces.oniBeaconStatusListener;
 import com.revenco.blesdk.utils.ClsUtils;
 import com.revenco.blesdk.utils.Constants;
 import com.revenco.blesdk.utils.MySharedPreferences;
-import com.revenco.commonlibrary.log.XLog;
+import com.revenco.blesdk.utils.XLog;
 
 import java.util.List;
 import java.util.UUID;

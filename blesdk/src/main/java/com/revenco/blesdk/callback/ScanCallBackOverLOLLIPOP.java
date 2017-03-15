@@ -11,7 +11,7 @@ import android.util.Log;
 
 import com.revenco.blesdk.core.iBeaconManager;
 import com.revenco.blesdk.interfaces.oniBeaconStatusListener;
-import com.revenco.commonlibrary.log.XLog;
+import com.revenco.blesdk.utils.XLog;
 
 import java.util.List;
 

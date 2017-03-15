@@ -9,7 +9,7 @@ import android.os.Build;
 import com.revenco.blesdk.core.iBeaconManager;
 import com.revenco.blesdk.interfaces.oniBeaconStatusListener;
 import com.revenco.blesdk.utils.ConvertUtil;
-import com.revenco.commonlibrary.log.XLog;
+import com.revenco.blesdk.utils.XLog;
 
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;

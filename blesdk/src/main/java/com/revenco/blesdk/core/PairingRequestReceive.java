@@ -11,7 +11,7 @@ import com.revenco.blesdk.callback.BleConnectGattCallback;
 import com.revenco.blesdk.callback.CallbackConnectHelper;
 import com.revenco.blesdk.utils.Constants;
 import com.revenco.blesdk.utils.MySharedPreferences;
-import com.revenco.commonlibrary.log.XLog;
+import com.revenco.blesdk.utils.XLog;
 
 public class PairingRequestReceive extends BroadcastReceiver {
     private static final String TAG = "PairingRequestReceive";

@@ -2,8 +2,6 @@ package com.revenco.blesdk.utils;
 
 import android.bluetooth.BluetoothDevice;
 
-import com.revenco.commonlibrary.log.XLog;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 

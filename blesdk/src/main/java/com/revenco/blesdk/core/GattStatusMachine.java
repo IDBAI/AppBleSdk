@@ -1,7 +1,7 @@
 package com.revenco.blesdk.core;
 
 import com.revenco.blesdk.interfaces.oniBeaconStatusListener;
-import com.revenco.commonlibrary.log.XLog;
+import com.revenco.blesdk.utils.XLog;
 
 import static com.revenco.blesdk.callback.BleConnectGattCallback.currentGattStatus;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_CONNECTED;

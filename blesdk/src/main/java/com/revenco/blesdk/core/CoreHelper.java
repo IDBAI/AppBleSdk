@@ -10,7 +10,7 @@ import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 
 import com.revenco.blesdk.R;
-import com.revenco.commonlibrary.log.XLog;
+import com.revenco.blesdk.utils.XLog;
 
 /**
  * Created by Administrator on 2016/11/3.

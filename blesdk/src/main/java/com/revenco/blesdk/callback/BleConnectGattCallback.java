@@ -18,6 +18,7 @@ import com.revenco.blesdk.core.DataHelper;
 import com.revenco.blesdk.core.GattOperations;
 import com.revenco.blesdk.core.GattStatusMachine;
 import com.revenco.blesdk.core.NotifyHelper;
+import com.revenco.blesdk.core.iBeaconManager;
 import com.revenco.blesdk.core.iBeaconManager.GattStatusEnum;
 import com.revenco.blesdk.exception.ConnectException;
 import com.revenco.blesdk.exception.GattException;
@@ -60,9 +61,9 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     private static final int MSG_BELOW_LOLLIPOP_RECONNECT_LAST_DEVICE = 200;
     //
     private static final int RETRY_READ_RSSI_MAX = 3;//读远程RSSI，最大重试次数
-    private static final int RETRY_CONNECT_MAX = 3;//connectGatt 直接重连，可尝试最大次数
+    private static final int RETRY_CONNECT_MAX = 2;//connectGatt 直接重连，可尝试最大次数
     private static final int RETRY_NEW_GATT_CONNECT_MAX = 9;//新建Gatt 重连，可尝试最大次数
-    private static final int LOGIC_FAILED_RETRY_MAX = 3;//写入数据逻辑失败，可尝试最大次数
+    private static final int LOGIC_FAILED_RETRY_MAX = 2;//写入数据逻辑失败，可尝试最大次数
     private static final int RETRY_DISCOVER_SERVICE_MAX = 3;//发现服务超时，最大可尝试次数
     //
     private static final long SLEEP_TIME_BEFORE_RECONNECT = 10L;//断开连接与再次连接之间间隔时间
@@ -390,7 +391,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         mHandler.removeMessages(MSG_CLOSE_GATT_CONNECT);//移除关闭gatt连接的消息
         if (!GattStatusMachine.publicMachineStatus(listener, GATT_STATUS_DISCONNECTED)) {
             XLog.d(TAG, "connectGatt.close();");
-            connectGatt.close();
+            closeAndRefresh();
             return;
         }
         //停止rssi读取
@@ -399,7 +400,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         if (retry_gatt_reconnect < RETRY_CONNECT_MAX) {
             if (isFinishSendData) {
                 XLog.d(TAG, "数据发送完成!已经断开了连接，不判断 isReceiveNotify，connectGatt.close();");
-                connectGatt.close();
+                closeAndRefresh();
             } else {
                 XLog.d(TAG, "数据未发送完成，onConnectFailure ->ReConnectGatt()");
                 ReConnectGatt();
@@ -408,7 +409,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             //reconnect超过最大次数，尝试new 出新的gatt对象。
             if (connectGatt != null) {
                 XLog.d(TAG, "onConnectFailure  -> connectGatt.close()");
-                connectGatt.close();
+                closeAndRefresh();
             }
             if (!isFinishSendData) {//数据未发送完成
                 XLog.d(TAG, "onConnectFailure ->newGattReConnect()");
@@ -417,13 +418,19 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         }
     }
 
+    private void closeAndRefresh() {
+        XLog.d(TAG, "closeAndRefresh() called ");
+        connectGatt.close();
+        iBeaconManager.getInstance().refreshDeviceCache();
+    }
+
     private void timoutMethod() {
         XLog.d("timeout", "timoutMethod() called.");
         reMoveAllMsgForTimeout();
         if (connectGatt != null) {
             XLog.d(TAG, "timeout  -> connectGatt.close()");
             XLog.d("timeout", "timeout  -> connectGatt.close()");
-            connectGatt.close();
+            closeAndRefresh();
         }
         if (listener != null)
             listener.timeout();
@@ -480,7 +487,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             XLog.d(TAG, "retry_gatt_reconnect 超过最大重试次数");
             if (connectGatt != null) {
                 XLog.d(TAG, "newGattReConnect() 之前 connectGatt.close();");
-                connectGatt.close();
+                closeAndRefresh();
             }
             newGattReConnect();
         }
@@ -533,7 +540,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
                 e.printStackTrace();
             }
             XLog.d(TAG, "finallySetTimeout() -> connectGatt.close()");
-            connectGatt.close();
+            closeAndRefresh();
         }
         reMoveAllMsgForTimeout();
         if (listener != null)
@@ -737,7 +744,11 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             XLog.d(TAG, string);
             XLog.d("show-timeout", string);
             NotifyHelper.getInstance().debuginfo(string);
-            GattOperations.dealNotify(connectGatt, value, listener);
+            if (!isReceiveNotify) {
+                XLog.e(TAG, "1 、 first receive notify!");
+                GattOperations.dealNotify(connectGatt, value, listener);
+            } else
+                XLog.e(TAG, "2 、 second receive notify!");
         }
     }
 
@@ -866,14 +877,14 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         } else {
             XLog.d("timeout", "timoutMethod() called.");
             reMoveAllMsgForTimeout();
-            if (connectGatt != null) {//处于连接中...
-                XLog.d(TAG, "//处于连接中...");
+            if (connectGatt != null) {//处于未连接状态
+                XLog.d(TAG, "处于未连接状态");
                 XLog.d(TAG, "timeout  -> connectGatt.disconnect()");
                 XLog.d("timeout", "timeout  -> connectGatt.disconnect()");
                 connectGatt.disconnect();
                 XLog.d(TAG, "timeout  -> connectGatt.close()");
                 XLog.d("timeout", "timeout  -> connectGatt.close()");
-                connectGatt.close();
+                closeAndRefresh();
             }
             if (listener != null)
                 listener.timeout();

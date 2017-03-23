@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.revenco.appblesdk.activities.AutoTestActivity">
+
+    <TextView
+        android:id="@+id/text_Rssi_au"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="信号强度："/>
+
+    <TextView
+        android:id="@+id/text_addr_au"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/text_Rssi_au"
+        tools:text="address："/>
+
+    <TextView
+        android:id="@+id/tv_sdk_au"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        tools:text="ANDOIRD SDK"/>
+
+    <LinearLayout
+        android:id="@+id/info_au"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_Rssi_au"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_succeed_au"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/holo_red_light"
+            tools:text="成功：0次"/>
+
+
+        <TextView
+            android:id="@+id/text_failure_au"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/holo_red_light"
+            tools:text="失败：0次"/>
+
+        <TextView
+            android:id="@+id/text_timeout_au"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/holo_red_light"
+            tools:text="超时：0次"/>
+
+        <TextView
+            android:id="@+id/text_rate_au"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.2"
+            android:gravity="right"
+            android:textColor="@android:color/holo_red_light"
+            tools:text="成功率：100%"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/center_au"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/info_au"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/text_tongji_au"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="开门平均耗时：1.220 秒"/>
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/edit_time_au"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/info_au"
+        android:layout_marginTop="20dp"
+        android:enabled="false"
+        android:focusable="false"/>
+
+
+</RelativeLayout>

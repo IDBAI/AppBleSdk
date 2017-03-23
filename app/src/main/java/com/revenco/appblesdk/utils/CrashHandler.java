@@ -12,7 +12,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.revenco.appblesdk.activities.MainActivity;
+import com.revenco.appblesdk.activities.AutoTestActivity;
 import com.revenco.blesdk.utils.XLog;
 
 import java.io.File;
@@ -82,7 +82,7 @@ public class CrashHandler implements UncaughtExceptionHandler {
             // 如果用户没有处理则让系统默认的异常处理器来处理
             mDefaultHandler.uncaughtException(thread, ex);
         }
-        Intent intent = new Intent(mContext, MainActivity.class);
+        Intent intent = new Intent(mContext, AutoTestActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mContext.startActivity(intent);
     }

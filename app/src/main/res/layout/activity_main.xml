@@ -9,105 +9,27 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.revenco.appblesdk.activities.MainActivity">
-
-    <TextView
-        android:id="@+id/text_Rssi"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="信号强度："/>
-    <TextView
-        android:id="@+id/text_addr"
-        android:layout_toRightOf="@+id/text_Rssi"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="address："/>
-
-    <TextView
-        android:id="@+id/tv_sdk"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        tools:text="ANDOIRD SDK"/>
-
-    <LinearLayout
-        android:id="@+id/info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/text_Rssi"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/text_succeed"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@android:color/holo_red_light"
-            tools:text="成功：0次"/>
-
-
-        <TextView
-            android:id="@+id/text_failure"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@android:color/holo_red_light"
-            tools:text="失败：0次"/>
-
-        <TextView
-            android:id="@+id/text_timeout"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@android:color/holo_red_light"
-            tools:text="超时：0次"/>
-
-        <TextView
-            android:id="@+id/text_rate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.2"
-            android:gravity="right"
-            android:textColor="@android:color/holo_red_light"
-            tools:text="成功率：100%"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/center"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/info"
-        android:layout_marginTop="5dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/text_tongji"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="开门平均耗时：1.220 秒"/>
-    </LinearLayout>
-
-    <EditText
-        android:id="@+id/edit_time"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/info"
-        android:layout_marginTop="20dp"
-        android:enabled="false"
-        android:focusable="false"/>
+    tools:context="com.revenco.appblesdk.activities.AutoTestActivity">
 
     <Button
-        android:text="点击测试"
+        android:id="@+id/shake"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/button"
-        android:layout_below="@+id/center"
-        android:layout_alignLeft="@+id/tv_sdk"
-        android:layout_alignStart="@+id/tv_sdk"
-        android:layout_marginLeft="34dp"
-        android:layout_marginStart="34dp"
-        android:layout_marginTop="44dp"/>
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="96dp"
+        android:layout_marginStart="96dp"
+        android:layout_marginTop="84dp"
+        android:text="摇一摇测试"/>
 
+    <Button
+        android:id="@+id/auto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/shake"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="74dp"
+        android:text="循环自动发包测试"/>
 
 </RelativeLayout>

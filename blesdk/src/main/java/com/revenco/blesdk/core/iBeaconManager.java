@@ -27,9 +27,9 @@ public class iBeaconManager implements BluetoothExceptionListener {
     private static final String TAG = "iBeaconManager";
     private static final int MSG_EXCEPTION = 2001;
     /**
-     * 每一次扫描周期 3.5 秒扫描不到信号，返回超时失败
+     * 每一次扫描周期 4.8 秒扫描不到信号，返回超时失败
      */
-    private static final long SCAN_PERIOD = 3500;
+    private static final long SCAN_PERIOD = 4800;
     /**
      * 超时
      */
@@ -186,6 +186,7 @@ public class iBeaconManager implements BluetoothExceptionListener {
      *
      * @return
      */
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public boolean refreshDeviceCache() {
         XLog.d(TAG, "refreshDeviceCache() called");
         try {

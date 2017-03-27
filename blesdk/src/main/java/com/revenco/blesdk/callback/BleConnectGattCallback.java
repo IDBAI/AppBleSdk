@@ -76,12 +76,26 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     public static volatile boolean isFinishSendData = false;
     //写队列
     public static volatile boolean isWritting = false;
-    //
-    private static long GATT_FIRST_CONNECT_TIMEOUT = 1800L;//首次进来连接超时
-    private static long GATT_RECONNECT_TIMEOUT = 1000L;//connectGatt 直接重连超时
-    private static long NEW_GATT_CONNECT_TIMEOUT = 1500L;//新建Gatt 重连超时
-    private static long WAIT_SERVICE_DISCOVER_TIMEOUT = 1000L;//连接成功 超时没有回调发现服务 ->重新发现服务,最多 RETRY_DISCOVER_SERVICE_MAX 次 -> 断开重连
-    private static long WAIT_DISCONNECT_TIMEOUT = 1000L;//connectGatt.disConnect 回调 onConnectFailure 超时
+    /**
+     * 首次进来连接超时
+     */
+    private static long GATT_FIRST_CONNECT_TIMEOUT = 1800L;
+    /**
+     * connectGatt 直接重连超时
+     */
+    private static long GATT_RECONNECT_TIMEOUT = 1000L;
+    /**
+     * 新建Gatt 重连超时
+     */
+    private static long NEW_GATT_CONNECT_TIMEOUT = 1500L;
+    /**
+     * 连接成功 超时没有回调发现服务 ->重新发现服务,最多 RETRY_DISCOVER_SERVICE_MAX 次 -> 断开重连
+     */
+    private static long WAIT_SERVICE_DISCOVER_TIMEOUT = 1000L;
+    /**
+     * connectGatt.disConnect 回调 onConnectFailure 超时
+     */
+    private static long WAIT_DISCONNECT_TIMEOUT = 1000L;
     private int reDiscoveredServiceTime = 0;
     private oniBeaconStatusListener listener;
     private BluetoothDevice device;
@@ -92,8 +106,6 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     private int retry_discovered_service;
     private Context context;
     private Handler mHandler;
-    //当前写的对象
-//    private Object currentWriteObject;
     private BluetoothGatt connectGatt;
     private boolean isTimeout = false;
 
@@ -118,14 +130,26 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
 
     private void initparams() {
         String manufacturer = Build.MANUFACTURER;
-        if (manufacturer.equals("samsung")) {//三星
+        if (manufacturer.equalsIgnoreCase("samsung")) {//三星
             XLog.d(TAG, "针对三星修改了超时配置");
-            GATT_FIRST_CONNECT_TIMEOUT = 3600L;//首次进来连接超时
-            GATT_RECONNECT_TIMEOUT = 2000L;//connectGatt 直接重连超时
-            NEW_GATT_CONNECT_TIMEOUT = 2000L;//新建Gatt 重连超时
-            WAIT_SERVICE_DISCOVER_TIMEOUT = 2500L;//连接成功 超时没有回调发现服务 ->重新发现服务,最多 RETRY_DISCOVER_SERVICE_MAX 次 -> 断开重连
-            WAIT_DISCONNECT_TIMEOUT = 1500L;//connectGatt.disConnect 回调 onConnectFailure 超时
+            GATT_FIRST_CONNECT_TIMEOUT = 3600L;
+            GATT_RECONNECT_TIMEOUT = 2000L;
+            NEW_GATT_CONNECT_TIMEOUT = 2000L;
+            WAIT_SERVICE_DISCOVER_TIMEOUT = 2500L;
+            WAIT_DISCONNECT_TIMEOUT = 1500L;
+        } else if (manufacturer.equalsIgnoreCase("Meizu")) {
+            XLog.d(TAG, "针对魅族修改了超时配置");
+            GATT_FIRST_CONNECT_TIMEOUT = 3600L;
+            GATT_RECONNECT_TIMEOUT = 2500L;
+            NEW_GATT_CONNECT_TIMEOUT = 2500L;
+            WAIT_SERVICE_DISCOVER_TIMEOUT = 2500L;
+            WAIT_DISCONNECT_TIMEOUT = 1500L;
         } else {//默认配置
+            GATT_FIRST_CONNECT_TIMEOUT = 1800L;
+            GATT_RECONNECT_TIMEOUT = 1000L;
+            NEW_GATT_CONNECT_TIMEOUT = 1500L;
+            WAIT_SERVICE_DISCOVER_TIMEOUT = 1000L;
+            WAIT_DISCONNECT_TIMEOUT = 1000L;
         }
     }
 
@@ -863,6 +887,16 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         if (isReceiveNotify) {
             XLog.d("timeout", "isReceiveNotify is true,return.");
             return;
+        }
+        //如果发送完成数据了，允许再等待100ms，等待notify，提高app开锁成功率，再执行timeout逻辑
+        if (currentGattStatus == GATT_STATUS_SENDDATA_SUCCESS && isFinishSendData) {
+            XLog.w(TAG, "超时，但是发送数据完成，开始等待100ms------start");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            XLog.w(TAG, "超时，但是发送数据完成，开始等待100ms------end");
         }
         XLog.d("timeout", "setTimeoutToStop() called");
         isTimeout = true;

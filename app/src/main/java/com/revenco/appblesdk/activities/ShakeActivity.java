@@ -2,11 +2,8 @@ package com.revenco.appblesdk.activities;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanResult;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -19,12 +16,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.os.Vibrator;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AlertDialog;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.dfqin.grantor.PermissionListener;
+import com.github.dfqin.grantor.PermissionsUtil;
 import com.revenco.appblesdk.R;
 import com.revenco.blesdk.core.iBeaconManager;
 import com.revenco.blesdk.interfaces.oniBeaconStatusListener;
@@ -37,7 +36,7 @@ import java.util.Date;
 
 import static com.revenco.appblesdk.BleApplication.SERVICE_UUID;
 
-public class ShakeActivity extends Activity implements SensorEventListener, oniBeaconStatusListener {
+public class ShakeActivity extends AppCompatActivity implements SensorEventListener, oniBeaconStatusListener {
     private static final int START_SHAKE = 0x1;
     private static final int AGAIN_SHAKE = 0x2;
     private static final int END_SHAKE = 0x3;
@@ -70,6 +69,31 @@ public class ShakeActivity extends Activity implements SensorEventListener, oniB
     private Object lock;
     private TextView text_Rssi;
     private TextView tv_sdk;
+    private PermissionListener permissionListener = new PermissionListener() {
+        @Override
+        public void permissionGranted(@NonNull String[] permissions) {
+            switch (permissions[0]) {
+                case Manifest.permission.ACCESS_COARSE_LOCATION:
+                    Toast.makeText(ShakeActivity.this, "已获取位置权限！", Toast.LENGTH_SHORT).show();
+                    break;
+                case Manifest.permission.WRITE_EXTERNAL_STORAGE:
+                    Toast.makeText(ShakeActivity.this, "已获取SD卡读写权限！", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+
+        @Override
+        public void permissionDenied(@NonNull String[] permissions) {
+            switch (permissions[0]) {
+                case Manifest.permission.ACCESS_COARSE_LOCATION:
+                    Toast.makeText(ShakeActivity.this, "位置权限被拒绝！", Toast.LENGTH_SHORT).show();
+                    break;
+                case Manifest.permission.WRITE_EXTERNAL_STORAGE:
+                    Toast.makeText(ShakeActivity.this, "SD卡读写权限被拒绝！", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
 
     /**
      * @param savedInstanceState
@@ -101,12 +125,10 @@ public class ShakeActivity extends Activity implements SensorEventListener, oniB
         }
         reset();
         lock = new Object();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            checkPermission();
-        }
         String getbleSDK = SDKUtils.getbleSDK(getApplicationContext());
         XLog.d(TAG, "ble SDK :" + getbleSDK);
         tv_sdk.setText(getbleSDK);
+        gantPermission();
     }
 
     private void reset() {
@@ -116,51 +138,6 @@ public class ShakeActivity extends Activity implements SensorEventListener, oniB
         totaltime = 0;
         rssiCount = 0;
         rssiTotal = 0;
-    }
-
-    /**
-     * 6.0所有的权限，一次性请求.
-     */
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void checkPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // Android M Permission check
-            if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    || this.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED
-                    || this.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Android 6.0需要动态请求权限，请允许.");
-                builder.setPositiveButton("好的", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_LIST);
-                    }
-                });
-                builder.show();
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        XLog.d(TAG, "onRequestPermissionsResult() called with: requestCode = [" + requestCode + "], permissions = [" + permissions + "], grantResults = [" + grantResults + "]");
-        switch (requestCode) {
-            case PERMISSION_REQUEST_LIST:
-                if (grantResults.length == 0)
-                    break;
-                for (int result : grantResults) {
-                    if (result == PackageManager.PERMISSION_DENIED) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                        builder.setMessage("有部分权限请求被拒绝，可以到应用中心开启。");
-                        builder.setPositiveButton("好的", null);
-                        builder.show();
-                        break;
-                    }
-                }
-                break;
-        }
     }
 
     @Override
@@ -213,8 +190,26 @@ public class ShakeActivity extends Activity implements SensorEventListener, oniB
 
     @Override
     protected void onResume() {
+        XLog.d(TAG, "onResume() called ");
         super.onResume();
         registSensor();
+    }
+
+    /**
+     * @return true:有权限
+     */
+    private boolean gantPermission() {
+        XLog.d(TAG, "gantPermission() called ");
+        if (!PermissionsUtil.hasPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            PermissionsUtil.TipInfo tipInfo = new PermissionsUtil.TipInfo("权限请求被拒绝", "位置权限请求被残忍拒绝", "取消", "打开设置");
+            PermissionsUtil.requestPermission(this, permissionListener, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, true, tipInfo);
+            return false;
+        } else if (!PermissionsUtil.hasPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {//sdcard权限
+            PermissionsUtil.TipInfo tipInfo = new PermissionsUtil.TipInfo("权限请求被拒绝", "SD卡读写权限请求被残忍拒绝", "取消", "打开设置");
+            PermissionsUtil.requestPermission(this, permissionListener, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, true, tipInfo);
+            return false;
+        } else
+            return true;
     }
 
     @Override
@@ -227,17 +222,27 @@ public class ShakeActivity extends Activity implements SensorEventListener, oniB
             float y = values[1];
             float z = values[2];
             if ((Math.abs(x) > 17 || Math.abs(y) > 17 || Math.abs(z) > 17) && !isShake) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                    if (!iBeaconManager.getInstance().init(this, this))
-                        return;
-                    // TODO: 实现摇动逻辑, 摇动后进行震动
-                    startTime = SystemClock.elapsedRealtime();
-                    startBle();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {//6.0动态获取权限
+                    if (gantPermission()) {//有权限
+                        startShake();
+                    }
+                } else {
+                    startShake();
                 }
-                isShake = true;
-                startShakeThread();
             }
         }
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private void startShake() {
+        XLog.d(TAG, "startShake() called ");
+        if (!iBeaconManager.getInstance().init(this, this))
+            return;
+        // TODO: 实现摇动逻辑, 摇动后进行震动
+        startTime = SystemClock.elapsedRealtime();
+        startBle();
+        isShake = true;
+        startShakeThread();
     }
 
     private void startShakeThread() {

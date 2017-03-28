@@ -2,7 +2,6 @@ package com.revenco.appblesdk.activities;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.le.ScanResult;
 import android.content.DialogInterface;
@@ -17,6 +16,7 @@ import android.os.SystemClock;
 import android.os.Vibrator;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +35,7 @@ import java.util.TimerTask;
 
 import static com.revenco.appblesdk.BleApplication.SERVICE_UUID;
 
-public class AutoTestActivity extends Activity implements oniBeaconStatusListener {
+public class AutoTestActivity extends AppCompatActivity implements oniBeaconStatusListener {
     private static final int START_SHAKE = 0x1;
     private static final int AGAIN_SHAKE = 0x2;
     private static final int END_SHAKE = 0x3;

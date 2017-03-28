@@ -2,6 +2,7 @@ package com.revenco.blesdk;
 
 import com.revenco.blesdk.utils.ConvertUtil;
 import com.revenco.blesdk.utils.RSAUtils;
+import com.revenco.network.utils.HttpRequest;
 
 import junit.framework.TestSuite;
 
@@ -17,7 +18,6 @@ import java.util.Map;
 public class ExampleUnitTest extends TestSuite {
     @Test
     public void addition_isCorrect() throws Exception {
-
     }
 
     /**
@@ -110,10 +110,7 @@ public class ExampleUnitTest extends TestSuite {
         byte[] CHAR_UUID_WRITE_04 = {0x55, 0x55, 0x55, 0x55, (byte) 0x96, (byte) 0xE2, 0x11, (byte) 0x9E, (byte) 0x9E, 0x11, (byte) 0xE2, (byte) 0x96, 0x55, 0x55, 0x55, 0x55};
         byte[] CHAR_UUID_WRITE_05 = {0x66, 0x66, 0x66, 0x66, (byte) 0x96, (byte) 0xE2, 0x11, (byte) 0x9E, (byte) 0x9E, 0x11, (byte) 0xE2, (byte) 0x96, 0x66, 0x66, 0x66, 0x66};
         byte[] CHAR_UUID_WRITE_06 = {0x77, 0x77, 0x77, 0x77, (byte) 0x96, (byte) 0xE2, 0x11, (byte) 0x9E, (byte) 0x9E, 0x11, (byte) 0xE2, (byte) 0x96, 0x77, 0x77, 0x77, 0x77};
-
-
         byte[] CHAR_UUID_NOTYFY = {(byte) 0x88, (byte) 0x88, (byte) 0x88, (byte) 0x88, (byte) 0x96, (byte) 0xE2, 0x11, (byte) 0x9E, (byte) 0x9E, 0x11, (byte) 0xE2, (byte) 0x96, (byte) 0x88, (byte) 0x88, (byte) 0x88, (byte) 0x88};
-
         System.out.println(ConvertUtil.byteServiceUUID2string(CHAR_UUID_WRITE_00));
         System.out.println(ConvertUtil.byteServiceUUID2string(CHAR_UUID_WRITE_01));
         System.out.println(ConvertUtil.byteServiceUUID2string(CHAR_UUID_WRITE_02));
@@ -122,6 +119,26 @@ public class ExampleUnitTest extends TestSuite {
         System.out.println(ConvertUtil.byteServiceUUID2string(CHAR_UUID_WRITE_05));
         System.out.println(ConvertUtil.byteServiceUUID2string(CHAR_UUID_WRITE_06));
         System.out.println(ConvertUtil.byteServiceUUID2string(CHAR_UUID_NOTYFY));
+    }
 
+    @Test
+    public void testHttp() {
+        HttpRequest httpRequest = new HttpRequest("http://www.baidu.com");
+        httpRequest.execut(new HttpRequest.RequestListener() {
+            @Override
+            public void onSucceed(String json) {
+                System.out.println(json);
+            }
+
+            @Override
+            public void onFailed(String err) {
+                System.out.println(err);
+            }
+
+            @Override
+            public void onCancel() {
+                System.out.println("onCancel !");
+            }
+        });
     }
 }

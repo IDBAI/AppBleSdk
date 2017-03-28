@@ -41,6 +41,6 @@ public class BleApplication extends Application {
     public void onCreate() {
         super.onCreate();
         crashHandler = CrashHandler.getInstance();
-        crashHandler.init(getApplicationContext());
+//        craashHandler.init(getApplicationContext());
     }
 }

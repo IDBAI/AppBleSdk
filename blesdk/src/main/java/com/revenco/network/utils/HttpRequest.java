@@ -3,14 +3,10 @@ package com.revenco.network.utils;
 import android.os.Handler;
 import android.os.Message;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -40,8 +36,7 @@ public class HttpRequest implements Runnable {
     private static final int HTTP_RETRY_MAX = 2;
     private Thread thread;
     private HttpURLConnection connection;
-    private JSONObject postParams;
-    private HashMap<String, String> getParams;
+    private HashMap<String, String> params;
     private RequestListener listener;
     private boolean isCancel;
     private httpMethod Method = httpMethod.GET;
@@ -77,18 +72,17 @@ public class HttpRequest implements Runnable {
      *
      * @param requeJson
      */
-    public void addPostParams(JSONObject requeJson) {
-        this.postParams = requeJson;
-        Method = POST;
+    public void addParams(HashMap requeJson) {
+        this.params = requeJson;
     }
 
     /**
      * 添加 GET 请求参数
      *
-     * @param getParams
+     * @param params
      */
-    public void addGetParams(HashMap getParams) {
-        this.getParams = getParams;
+    public void addGetParams(HashMap params) {
+        this.params = params;
         Method = GET;
     }
 
@@ -97,7 +91,14 @@ public class HttpRequest implements Runnable {
      *
      * @param listener
      */
-    public void execut(RequestListener listener) {
+    public void executPost(RequestListener listener) {
+        Method = POST;
+        this.listener = listener;
+        this.thread.start();
+    }
+
+    public void executGet(RequestListener listener) {
+        Method = GET;
         this.listener = listener;
         this.thread.start();
     }
@@ -128,7 +129,7 @@ public class HttpRequest implements Runnable {
             e.printStackTrace();
             Message message = mHandler.obtainMessage();
             message.what = MSG_FAILED;
-            message.obj = "无网络连接！";
+            message.obj = "网络连接异常！";
             mHandler.sendMessage(message);
         } finally {
             if (connection != null)
@@ -138,9 +139,9 @@ public class HttpRequest implements Runnable {
     }
 
     private void sendGet() throws IOException {
-        if (getParams != null) {
+        if (params != null) {
             StringBuilder sb = new StringBuilder();
-            Iterator iterator = getParams.entrySet().iterator();
+            Iterator iterator = params.entrySet().iterator();
             while (iterator.hasNext()) {
                 Map.Entry entry = (Map.Entry) iterator.next();
                 String key = (String) entry.getKey();
@@ -174,8 +175,8 @@ public class HttpRequest implements Runnable {
                 return;
             }
             send++;
-            System.out.println(send + "、请求 url -> " + url.toString());
-            System.out.println(send + "、请求 params -> " + postParams);
+            System.out.println(send + "、" + Method.toString() + " 请求 url -> " + url.toString());
+            System.out.println(send + "、" + Method.toString() + " 请求 params -> " + params);
             //发送请求
             responseCode = connection.getResponseCode();
             System.out.println(send + "、请求 响应码 -> " + responseCode);
@@ -191,13 +192,19 @@ public class HttpRequest implements Runnable {
     }
 
     private void sendPost() throws IOException {
-        byte[] data = null;
-        if (postParams != null)
-            try {
-                data = postParams.toString().getBytes("UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                data = postParams.toString().getBytes();
+        byte[] body = null;
+        if (params != null) {
+            StringBuilder sb = new StringBuilder();
+            Iterator iterator = params.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry entry = (Map.Entry) iterator.next();
+                String key = (String) entry.getKey();
+                String value = (String) entry.getValue();
+                sb.append(key).append("=").append(value).append("&");
             }
+            String params = sb.deleteCharAt(sb.length() - 1).toString();
+            body = params.getBytes("utf-8");
+        }
         URL url = new URL(urlString);
         int send = 0;
         int responseCode;
@@ -212,15 +219,14 @@ public class HttpRequest implements Runnable {
             connection.setDoInput(true);
             connection.setUseCaches(false);//post 方式不能使用缓存
             connection.setRequestProperty("Charset", "UTF-8");
-            connection.setRequestProperty("Content-Type", "application/json");
-            if (data != null)
-                connection.setRequestProperty("Content-Length", String.valueOf(data.length));
-            connection.connect();
-            if (data != null) {
-                BufferedOutputStream outputStream = new BufferedOutputStream(connection.getOutputStream());
-                outputStream.write(data);
-                outputStream.flush();
-                outputStream.close();
+            connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; charset=utf-8");
+            if (body != null)
+                connection.setRequestProperty("Content-Length", String.valueOf(body.length));
+//            connection.connect();//post此处不需要connect
+            if (body != null) {
+                DataOutputStream out = new DataOutputStream(connection.getOutputStream());
+                out.write(body);
+                out.close();
             }
             if (isCancel) {
                 connection.disconnect();
@@ -231,8 +237,8 @@ public class HttpRequest implements Runnable {
                 return;
             }
             send++;
-            System.out.println(send + "、请求 url -> " + url.toString());
-            System.out.println(send + "、请求 params -> " + postParams);
+            System.out.println(send + "、" + Method.toString() + " 请求 url -> " + url.toString());
+            System.out.println(send + "、" + Method.toString() + " 请求 params -> " + params);
             //发送请求
             responseCode = connection.getResponseCode();
             System.out.println(send + "、请求 响应码 -> " + responseCode);
@@ -299,27 +305,6 @@ public class HttpRequest implements Runnable {
             message.obj = "解析数据产生IO异常！";
             mHandler.sendMessage(message);
         }
-    }
-
-    /**
-     * 生成jsonObject对象
-     *
-     * @param key
-     * @param values
-     * @return
-     */
-    public JSONObject geneJsonObj(String[] key, String[] values) {
-        if (key.length != values.length)
-            return null;
-        JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject();
-            for (int i = 0; i < key.length; i++) {
-                jsonObject.put(key[i], values[i]);
-            }
-        } catch (JSONException ex) {
-        }
-        return jsonObject;
     }
 
     /**

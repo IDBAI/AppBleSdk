@@ -6,6 +6,7 @@ import com.revenco.network.utils.HttpRequest;
 
 import junit.framework.TestSuite;
 
+import org.json.JSONObject;
 import org.junit.Test;
 
 import java.util.Map;
@@ -123,22 +124,35 @@ public class ExampleUnitTest extends TestSuite {
 
     @Test
     public void testHttp() {
-        HttpRequest httpRequest = new HttpRequest("http://www.baidu.com");
-        httpRequest.execut(new HttpRequest.RequestListener() {
-            @Override
-            public void onSucceed(String json) {
-                System.out.println(json);
-            }
+//        HttpRequest httpRequest = new HttpRequest("http://www.baidu.com");
+//        httpRequest.execut(new HttpRequest.RequestListener() {
+//            @Override
+//            public void onSucceed(String json) {
+//                System.out.println(json);
+//            }
+//
+//            @Override
+//            public void onFailed(String err) {
+//                System.out.println(err);
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                System.out.println("onCancel !");
+//            }
+//        });
+        /**
+         http://app.utvgo.com:8099/utvgoClient/interfaces/content_listContent.action?channelId=6&pageNo=1&pageSize=30&typeId=0&keyWord=%E5%87%BA
+         **/
+        HttpRequest httpRequest = new HttpRequest("http://app.utvgo.com:8099/utvgoClient/interfaces/content_listContent.action");
+        String[] key = {"channelId", "pageNo", "pageSize", "typeId", "keyWord"};
+        String[] values = {"6", "1", "30", "0", "%E5%87%BA"};
+        JSONObject jsonObject = httpRequest.geneJsonObj(key, values);
+        System.out.println(jsonObject.toString());
+        httpRequest.addParams(jsonObject);
 
-            @Override
-            public void onFailed(String err) {
-                System.out.println(err);
-            }
-
-            @Override
-            public void onCancel() {
-                System.out.println("onCancel !");
-            }
-        });
+//        HashMap<String, String> hashMap = httpRequest.geneHashMap(key, values);
+//        httpRequest.addGetParams(hashMap);
+//        httpRequest.execut(null);
     }
 }

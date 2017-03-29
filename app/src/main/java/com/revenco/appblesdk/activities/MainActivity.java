@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.revenco.appblesdk.R;
-import com.revenco.blesdk.utils.XLog;
 import com.revenco.network.utils.HttpRequest;
 
 import java.util.HashMap;
@@ -52,21 +51,17 @@ public class MainActivity extends AppCompatActivity {
                 HttpRequest httpRequest = new HttpRequest("http://app.utvgo.com:8099/utvgoClient/interfaces/content_listContent.action");
                 String[] key = {"channelId", "pageNo", "pageSize", "typeId", "keyWord"};
                 String[] values = {"6", "1", "30", "0", "%E5%87%BA"};
-//                JSONObject jsonObject = httpRequest.geneJsonObj(key, values);
-//                httpRequest.addPostParams(jsonObject);
                 HashMap<String, String> hashMap = httpRequest.geneHashMap(key, values);
-                httpRequest.addGetParams(hashMap);
-                httpRequest.execut(new HttpRequest.RequestListener() {
-                    @Override
-                    public void onSucceed(String json) {
-                        XLog.d(TAG, json);
-                    }
-
-                    @Override
-                    public void onFailed(String err) {
-                        Toast.makeText(MainActivity.this, err, Toast.LENGTH_SHORT).show();
-                    }
-                });
+                httpRequest.addParams(hashMap);
+                //POST 或者 GET 方式均测试可以
+                httpRequest.executGet(null);
+//                httpRequest.executPost(null);
+//
+//                HttpRequest httpRequest = new HttpRequest("http://res.weicontrol.cn/api_V2/LoginIFace");
+//                String[] key = {"12345678910"};
+//                String[] values = {"1234656"};
+//                httpRequest.addParams(httpRequest.geneHashMap(key, values));
+//                httpRequest.executPost(null);
             }
         });
     }

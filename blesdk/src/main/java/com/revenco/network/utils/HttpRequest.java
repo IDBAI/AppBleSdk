@@ -68,22 +68,12 @@ public class HttpRequest implements Runnable {
     }
 
     /**
-     * 添加　POST 请求参数
+     * 添加请求参数
      *
      * @param requeJson
      */
     public void addParams(HashMap requeJson) {
         this.params = requeJson;
-    }
-
-    /**
-     * 添加 GET 请求参数
-     *
-     * @param params
-     */
-    public void addGetParams(HashMap params) {
-        this.params = params;
-        Method = GET;
     }
 
     /**

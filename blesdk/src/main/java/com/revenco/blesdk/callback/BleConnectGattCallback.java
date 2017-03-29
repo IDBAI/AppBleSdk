@@ -24,13 +24,10 @@ import com.revenco.blesdk.exception.ConnectException;
 import com.revenco.blesdk.exception.GattException;
 import com.revenco.blesdk.interfaces.bleCharacterCallback;
 import com.revenco.blesdk.interfaces.oniBeaconStatusListener;
-import com.revenco.blesdk.utils.Constants;
 import com.revenco.blesdk.utils.ConvertUtil;
-import com.revenco.blesdk.utils.MySharedPreferences;
 import com.revenco.blesdk.utils.XLog;
 
 import java.util.List;
-import java.util.UUID;
 
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_CONNECTED;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_CONNECTTING;
@@ -621,8 +618,6 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         resetWriting();
         XLog.d(TAG, "onServicesDiscovered() called with: connectGatt = [" + connectGatt + "], status = [" + status + "]");
         if (connectGatt != null) {
-            String write_uuid = MySharedPreferences.getStringPreference(context, Constants.TAG_Write_UUID);
-            String notify_uuid = MySharedPreferences.getStringPreference(context, Constants.TAG_Notify_UUID);
             List<BluetoothGattService> services = connectGatt.getServices();
             if (services.isEmpty()) {
                 XLog.d(TAG, "services is empty.");
@@ -703,7 +698,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             XLog.e(TAG, "    service is null");
             return;
         }
-        BluetoothGattCharacteristic characteristic = service.getCharacteristic(UUID.fromString(Config.NOTIFY_UUID));
+        BluetoothGattCharacteristic characteristic = CallbackConnectHelper.getInstance().getGattCharByConfigUUID(service, Config.NOTIFY_UUID);
         if (characteristic == null) {
             XLog.e(TAG, "   characteristic is null");
             return;
@@ -735,16 +730,16 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         XLog.d(TAG, "Thread name = " + Thread.currentThread().getName());
         XLog.d(TAG, "Thread id = " + Thread.currentThread().getId());
         XLog.d(TAG, "onCharacteristicWrite() called with: connectGatt = [" + connectGatt + "], characteristic = [" + characteristic + "], status = [" + status + "]");
-        String desUuid = characteristic.getUuid().toString();
+        String charUuid = characteristic.getUuid().toString();
         String hexStr = ConvertUtil.byte2HexStr(characteristic.getValue());
-        XLog.d("show-timeout", "onCharacteristicWrite() -> desUuid = " + desUuid + "\n" +
+        XLog.d("show-timeout", "onCharacteristicWrite() -> desUuid = " + charUuid + "\n" +
                 " hexStr = " + hexStr);
         if (status == BluetoothGatt.GATT_SUCCESS) {
             retry_logic_fail = 0;
             XLog.d(TAG, "onCharacteristicWrite succeed and set retry_logic_fail = 0.");
             XLog.d(TAG, "CharacteristicUuid =" + characteristic.getUuid() + "  -> startWrite data success .");
             onWriteDataSuccess(connectGatt, characteristic);
-            DataHelper.getInstance().setUUIDHasWrited(desUuid.toUpperCase());
+            DataHelper.getInstance().setUUIDHasWrited(charUuid.toUpperCase());
             DataHelper.getInstance().nextWrite(connectGatt);
         } else {
             //写入失败，重试3次

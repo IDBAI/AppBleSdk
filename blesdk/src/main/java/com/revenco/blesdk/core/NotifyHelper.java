@@ -31,7 +31,10 @@ import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_
 public class NotifyHelper {
     private static final String TAG = "NotifyHelper";
     private static NotifyHelper instance;
-    private Map<String, Boolean> notifyuuidmap = new HashMap<>();
+    /**
+     * notify的描述的UUID
+     */
+    private Map<String, Boolean> notifyDescuuidmap = new HashMap<>();
 
     public synchronized static NotifyHelper getInstance() {
         if (instance == null)
@@ -39,15 +42,20 @@ public class NotifyHelper {
         return instance;
     }
 
+    /**
+     * 填充描述符UUID列表
+     *
+     * @param desc
+     */
     public void fillmap(BluetoothGattDescriptor desc) {
         if (desc.getUuid() != null) {
             XLog.d(TAG, "desc.getUuid().toString() = " + desc.getUuid().toString());
-            notifyuuidmap.put(desc.getUuid().toString(), false);
+            notifyDescuuidmap.put(desc.getUuid().toString(), false);
         }
     }
 
     public int getnotifyuuidmapSize() {
-        return notifyuuidmap.size();
+        return notifyDescuuidmap.size();
     }
 
     public void setNextNotify(oniBeaconStatusListener listener, BluetoothGatt gatt) {
@@ -57,7 +65,7 @@ public class NotifyHelper {
             XLog.d(TAG, "    service is null");
             return;
         }
-        BluetoothGattCharacteristic characteristic = service.getCharacteristic(UUID.fromString(Config.NOTIFY_UUID));
+        BluetoothGattCharacteristic characteristic = CallbackConnectHelper.getInstance().getGattCharByConfigUUID(service, Config.NOTIFY_UUID);
         if (characteristic == null) {
             XLog.d(TAG, "   characteristic is null");
             return;
@@ -68,7 +76,7 @@ public class NotifyHelper {
         boolean setCharacteristicNotification = gatt.setCharacteristicNotification(characteristic, true);
         XLog.d("GOOD", "   setCharacteristicNotification: " + setCharacteristicNotification);
         try {
-            UUID uuid = UUID.fromString(getnotifyUuid());
+            UUID uuid = UUID.fromString(getnotifyDescUuid());
             BluetoothGattDescriptor descriptor = characteristic.getDescriptor(uuid);
             debug(descriptor);
             descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
@@ -80,12 +88,17 @@ public class NotifyHelper {
         }
     }
 
-    private String getnotifyUuid() {
-        XLog.d(TAG, "getnotifyUuid() called");
+    /**
+     * 获取未设置的描述符UUID
+     *
+     * @return
+     */
+    private String getnotifyDescUuid() {
+        XLog.d(TAG, "getnotifyDescUuid() called");
         String uuid = "";
-        Set<String> keySet = notifyuuidmap.keySet();
+        Set<String> keySet = notifyDescuuidmap.keySet();
         for (String key : keySet) {
-            Boolean aBoolean = notifyuuidmap.get(key);
+            Boolean aBoolean = notifyDescuuidmap.get(key);
             if (!aBoolean) {
                 uuid = key;
                 break;
@@ -114,10 +127,10 @@ public class NotifyHelper {
      */
     public void setMark(String uuid) {
         XLog.d(TAG, "setMark() called with: uuid = [" + uuid + "]");
-        Set<String> keySet = notifyuuidmap.keySet();
+        Set<String> keySet = notifyDescuuidmap.keySet();
         for (String key : keySet) {
             if (key.equalsIgnoreCase(uuid)) {
-                notifyuuidmap.put(key, true);
+                notifyDescuuidmap.put(key, true);
                 break;
             }
         }
@@ -131,9 +144,9 @@ public class NotifyHelper {
     public boolean isfinishset() {
         XLog.d(TAG, "isfinishset() called");
         boolean result = true;
-        Set<String> keySet = notifyuuidmap.keySet();
+        Set<String> keySet = notifyDescuuidmap.keySet();
         for (String key : keySet) {
-            Boolean aBoolean = notifyuuidmap.get(key);
+            Boolean aBoolean = notifyDescuuidmap.get(key);
             if (!aBoolean) {
                 result = false;
                 break;
@@ -141,7 +154,7 @@ public class NotifyHelper {
         }
         XLog.d(TAG, "result = " + result);
         if (result) {
-            notifyuuidmap.clear();
+            notifyDescuuidmap.clear();
         }
         return result;
     }

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.revenco.blesdk.callback.BleConnectGattCallback.isFinishSendData;
@@ -74,12 +73,36 @@ public class DataHelper {
 
     /**
      * 设置UUID写入成功的标志
+     * <p>
+     * //        11111111-2000-0896-9EE2-119E11111111 -> MIUI8 错误的UUID
+     * <p>
+     * //        11111111-96E2-119E-9E11-E29611111111 ->正确
      *
-     * @param desUuid
+     * @param charUuid
      */
-    public void setUUIDHasWrited(String desUuid) {
-        XLog.d(TAG, "setUUIDHasWrited() called with: desUuid = [" + desUuid + "]");
-        WRITEUUIDMAP.put(desUuid, true);
+    public void setUUIDHasWrited(String charUuid) {
+        XLog.d(TAG, "setUUIDHasWrited() called with: desUuid = [" + charUuid + "]");
+        if (WRITEUUIDMAP.containsKey(charUuid)) {
+            WRITEUUIDMAP.put(charUuid, true);
+        } else {
+            //兼容UUID读取出错问题
+            String uuid = "";
+            if (charUuid.startsWith("11111111"))
+                uuid = Config.WRITE_UUID1;
+            else if (charUuid.startsWith("22222222"))
+                uuid = Config.WRITE_UUID2;
+            else if (charUuid.startsWith("33333333"))
+                uuid = Config.WRITE_UUID3;
+            else if (charUuid.startsWith("44444444"))
+                uuid = Config.WRITE_UUID4;
+            else if (charUuid.startsWith("55555555"))
+                uuid = Config.WRITE_UUID5;
+            else if (charUuid.startsWith("66666666"))
+                uuid = Config.WRITE_UUID6;
+            else if (charUuid.startsWith("77777777"))
+                uuid = Config.WRITE_UUID7;
+            WRITEUUIDMAP.put(uuid, true);
+        }
     }
 
     private String getNextWriteUUID() {
@@ -144,12 +167,7 @@ public class DataHelper {
             XLog.d(TAG, "    service is null");
             return;
         }
-        UUID uuid = UUID.fromString(getNextWriteUUID());
-        if (uuid == null) {
-            XLog.d(TAG, "    uuid is null");
-            return;
-        }
-        BluetoothGattCharacteristic character = service.getCharacteristic(uuid);
+        BluetoothGattCharacteristic character = CallbackConnectHelper.getInstance().getGattCharByConfigUUID(service, getNextWriteUUID());
         if (character == null) {
             XLog.d(TAG, "    character is null");
             return;

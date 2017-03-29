@@ -2,6 +2,7 @@ package com.revenco.blesdk.callback;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.os.Build;
@@ -118,5 +119,64 @@ public class CallbackConnectHelper {
             }
         }
         return service;
+    }
+
+    /**
+     * 兼容MIUI8系统或者其他出现UUID错误的问题
+     *
+     * @param service
+     * @param uuid
+     * @return
+     */
+    public BluetoothGattCharacteristic getGattCharByConfigUUID(BluetoothGattService service, String uuid) {
+        XLog.d(TAG, "getGattCharByConfigUUID() called ,uuid = " + uuid);
+        if (service == null) {
+            XLog.e(TAG, "service == null");
+            return null;
+        }
+        BluetoothGattCharacteristic characteristic = service.getCharacteristic(UUID.fromString(uuid));
+        if (characteristic == null) {
+            XLog.e(TAG, "characteristic is null ,i will get characteristic by startwith() method!");
+            List<BluetoothGattCharacteristic> list = service.getCharacteristics();
+            for (BluetoothGattCharacteristic chartemp : list) {
+                switch (uuid) {
+                    case Config.NOTIFY_UUID:
+                        if (chartemp.getUuid().toString().startsWith("88888888"))
+                            characteristic = chartemp;
+                        break;
+                    case Config.WRITE_UUID1:
+                        if (chartemp.getUuid().toString().startsWith("11111111"))
+                            characteristic = chartemp;
+                        break;
+                    case Config.WRITE_UUID2:
+                        if (chartemp.getUuid().toString().startsWith("22222222"))
+                            characteristic = chartemp;
+                        break;
+                    case Config.WRITE_UUID3:
+                        if (chartemp.getUuid().toString().startsWith("33333333"))
+                            characteristic = chartemp;
+                        break;
+                    case Config.WRITE_UUID4:
+                        if (chartemp.getUuid().toString().startsWith("44444444"))
+                            characteristic = chartemp;
+                        break;
+                    case Config.WRITE_UUID5:
+                        if (chartemp.getUuid().toString().startsWith("55555555"))
+                            characteristic = chartemp;
+                        break;
+                    case Config.WRITE_UUID6:
+                        if (chartemp.getUuid().toString().startsWith("66666666"))
+                            characteristic = chartemp;
+                        break;
+                    case Config.WRITE_UUID7:
+                        if (chartemp.getUuid().toString().startsWith("77777777"))
+                            characteristic = chartemp;
+                        break;
+                }
+                if (characteristic != null)
+                    break;
+            }
+        }
+        return characteristic;
     }
 }

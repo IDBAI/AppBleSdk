@@ -4,7 +4,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.revenco.database.buss.BleOpenRecordBuss;
 import com.revenco.database.buss.CertificateBuss;
+import com.revenco.database.buss.StatisticalBuss;
+import com.revenco.database.buss.UserBuss;
 
 /**
  * <p>PROJECT : AppBleSdk</p>
@@ -28,7 +31,10 @@ public class SqliteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        BleOpenRecordBuss.createTable(db);
         CertificateBuss.createTable(db);
+        StatisticalBuss.createTable(db);
+        UserBuss.createTable(db);
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.revenco.database.buss;
 
 import android.database.sqlite.SQLiteDatabase;
 
-import com.revenco.database.SqlHelper;
+import com.revenco.database.helper.SqlStatementHelper;
 
 /**
  * <p>PROJECT : AppBleSdk</p>
@@ -16,10 +16,10 @@ public class StatisticalBuss {
 
     public static void createTable(SQLiteDatabase db) {
         StringBuilder sb = new StringBuilder();
-        sb.append(SqlHelper.CreateTablePre)
+        sb.append(SqlStatementHelper.CreateTablePre)
                 .append(tableName)
                 .append("(")
-                .append(SqlHelper.ID_PRIVATE_KEY)
+                .append(SqlStatementHelper.ID_PRIVATE_KEY)
                 .append("deviceId  TEXT").append(",")
                 .append("deviceAddress TEXT").append(",")
                 .append("totalCount INTEGER").append(",")

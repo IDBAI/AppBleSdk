@@ -1,8 +1,13 @@
 package com.revenco.database.buss;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.revenco.database.bean.StatisticalBean;
 import com.revenco.database.helper.SqlStatementHelper;
+import com.revenco.database.helper.SqliteHelper;
 
 /**
  * <p>PROJECT : AppBleSdk</p>
@@ -23,12 +28,42 @@ public class StatisticalBuss {
                 .append("deviceId  TEXT").append(",")
                 .append("deviceAddress TEXT").append(",")
                 .append("totalCount INTEGER").append(",")
-                .append("openSuccessCount INTEGER").append(",")
+                .append("successCount INTEGER").append(",")
                 .append("timeoutCount  INTEGER").append(",")
                 .append("failedCount INTEGER").append(",")
                 .append("averageRSSI INTEGER").append(",")
                 .append("averageOpenTime REAL").append(",")//REAL 存储float类型
-                .append("successRate  REAL").append(")");
+                .append("successRate  REAL").append(",")
+                .append("tag TEXT").append(")");
         db.execSQL(sb.toString());
+    }
+
+    /**
+     * @param context
+     * @param bean
+     * @return 返回 最新插入数据的自增长主键ID
+     */
+    public static int insertRow(Context context, StatisticalBean bean) {
+        int ID = -1;
+        if (bean == null)
+            return ID;
+        SQLiteDatabase db = new SqliteHelper(context).getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.execSQL("INSERT INTO  " + tableName + " (deviceId, deviceAddress, totalCount,successCount,timeoutCount,failedCount,averageRSSI,averageOpenTime,successRate,tag)  VALUES(?,?,?,?,?,?,?,?,?,?)", new Object[]{
+                    bean.deviceId, bean.deviceAddress, bean.totalCount, bean.successCount, bean.timeoutCount, bean.failedCount, bean.averageRSSI, bean.averageOpenTime, bean.successRate,bean.tag
+            });
+            Cursor cursor = db.rawQuery("SELECT last_insert_rowid() FROM " + tableName, null);
+            if (cursor.moveToFirst()) {
+                ID = cursor.getInt(0);
+            }
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+        return ID;
     }
 }

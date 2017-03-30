@@ -29,9 +29,9 @@ public class BleOpenRecordBean implements Serializable {
     /**
      * 扫描时间
      */
-    public int scanTime;
+    public float scanTime;
 
-    public int CertificateIndex;
+    public int certificateIndex;
 
     public String openResult;
 
@@ -39,7 +39,11 @@ public class BleOpenRecordBean implements Serializable {
     /**
      * 开门耗费时间
      */
-    public int openConsumeTime;
+    public float openConsumeTime;
 
 
+    /**
+     * 保留字段
+     */
+    public String tag;
 }

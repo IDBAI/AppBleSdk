@@ -24,4 +24,8 @@ public class UserBean implements Serializable {
      * 小区ID
      */
     public String communityId;
+    /**
+     * 保留字段
+     */
+    public String tag;
 }

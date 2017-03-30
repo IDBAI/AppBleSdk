@@ -18,7 +18,7 @@ public class CertificateBean implements Serializable {
     /**
      * 证书索引值
      */
-    public int index;
+    public int certificateIndex;
     /**
      * 设备ID
      */
@@ -34,9 +34,9 @@ public class CertificateBean implements Serializable {
     /**
      * 证书内容
      */
-    public String Content;
+    public String content;
     /**
-     * 备用
+     * 保留字段
      */
-    public String Tag;
+    public String tag;
 }

@@ -36,10 +36,20 @@
         android:id="@+id/httpTest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="63dp"
         android:text="网络测试"
         android:layout_below="@+id/auto"
         android:layout_alignLeft="@+id/shake"
-        android:layout_alignStart="@+id/shake"/>
+        android:layout_alignStart="@+id/shake"
+        android:layout_marginTop="59dp"/>
+
+    <Button
+        android:id="@+id/dataBaseTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="数据库测试"
+        android:layout_marginTop="14dp"
+        android:layout_below="@+id/httpTest"
+        android:layout_alignLeft="@+id/auto"
+        android:layout_alignStart="@+id/auto"/>
 
 </RelativeLayout>

@@ -9,6 +9,15 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.revenco.appblesdk.R;
+import com.revenco.blesdk.utils.XLog;
+import com.revenco.database.bean.BleOpenRecordBean;
+import com.revenco.database.bean.CertificateBean;
+import com.revenco.database.bean.StatisticalBean;
+import com.revenco.database.bean.UserBean;
+import com.revenco.database.buss.BleOpenRecordBuss;
+import com.revenco.database.buss.CertificateBuss;
+import com.revenco.database.buss.StatisticalBuss;
+import com.revenco.database.buss.UserBuss;
 import com.revenco.network.utils.HttpRequest;
 
 import java.util.HashMap;
@@ -64,6 +73,66 @@ public class MainActivity extends AppCompatActivity {
 //                httpRequest.executPost(null);
             }
         });
+        findViewById(R.id.dataBaseTest).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bleOpenRecordTest();
+                certificateTest();
+                statisticalTest();
+                userTest();
+            }
+        });
+    }
+
+    private void bleOpenRecordTest() {
+        BleOpenRecordBean bean = new BleOpenRecordBean();
+        bean.certificateIndex = 101;
+        bean.deviceAddress = "11223344556677889900";
+        bean.deviceId = "测试设备id";
+        bean.openConsumeTime = 2.1021f;
+        bean.openResult = "sucess";
+        bean.RSSI = -55;
+        bean.scanTime = 1.021f;
+        bean.reason = "成功没原因";
+        bean.userId = "godfather";
+        int id = BleOpenRecordBuss.insertRow(getApplicationContext(), bean);
+        XLog.d(TAG, "开门记录id：" + id);
+    }
+
+    private void certificateTest() {
+        CertificateBean bean = new CertificateBean();
+        bean.appBleMac = "66:66:66:66:66";
+        bean.certificateIndex = 1001;
+        bean.content = "jdlgjrionkdfjdjf-4-5=1243l5-45645ip6k;23-41=3i354'0954065-=7967901JEGR44T58R5+52";
+        bean.deviceAddress = "11223344556677889900";
+        bean.deviceId = "测试设备id";
+        bean.tag = "保留字段";
+        int id = CertificateBuss.insertRow(getApplicationContext(), bean);
+        XLog.d(TAG, "证书id :" + id);
+    }
+
+    private void statisticalTest() {
+        StatisticalBean bean = new StatisticalBean();
+        bean.averageOpenTime = 2.101f;
+        bean.averageRSSI = -55;
+        bean.deviceAddress = "11223344556677889900";
+        bean.deviceId = "测试设备id";
+        bean.failedCount = 50;
+        bean.successCount = 100;
+        bean.timeoutCount = 0;
+        bean.totalCount = 150;
+        bean.successRate = 0.510f;
+        int id = StatisticalBuss.insertRow(getApplicationContext(), bean);
+        XLog.d(TAG, "统计id：" + id);
+    }
+
+    private void userTest() {
+        UserBean bean = new UserBean();
+        bean.communityId = "测试小区";
+        bean.mobileNum = "13800138001";
+        bean.userId = "godfather";
+        int id = UserBuss.insertRow(getApplicationContext(), bean);
+        XLog.d(TAG, "用户id: " + id);
     }
 
     private void test() {

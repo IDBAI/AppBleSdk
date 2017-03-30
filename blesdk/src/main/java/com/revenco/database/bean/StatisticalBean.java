@@ -18,7 +18,7 @@ public class StatisticalBean implements Serializable {
      * 总次数
      */
     public int totalCount;
-    public int openSuccessCount;
+    public int successCount;
     public int timeoutCount;
     public int failedCount;
     /**
@@ -33,4 +33,8 @@ public class StatisticalBean implements Serializable {
      * 成功率
      */
     public float successRate;
+    /**
+     * 保留字段
+     */
+    public String tag;
 }

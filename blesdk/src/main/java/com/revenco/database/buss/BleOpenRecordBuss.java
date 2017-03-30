@@ -1,8 +1,13 @@
 package com.revenco.database.buss;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.revenco.database.bean.BleOpenRecordBean;
 import com.revenco.database.helper.SqlStatementHelper;
+import com.revenco.database.helper.SqliteHelper;
 
 /**
  * <p>PROJECT : AppBleSdk</p>
@@ -24,11 +29,41 @@ public class BleOpenRecordBuss {
                 .append("deviceId TEXT").append(",")
                 .append("deviceAddress TEXT").append(",")
                 .append("RSSI INTEGER").append(",")
-                .append("scanTime INTEGER").append(",")
-                .append("CertificateIndex INTEGER").append(",")
+                .append("scanTime REAL").append(",")
+                .append("certificateIndex INTEGER").append(",")
                 .append("openResult TEXT").append(",")
                 .append("reason TEXT").append(",")
-                .append("openConsumeTime INTEGER").append(")");
+                .append("openConsumeTime REAL").append(",")
+                .append("tag TEXT").append(")");
         db.execSQL(sb.toString());
+    }
+
+    /**
+     * @param context
+     * @param bean
+     * @return 返回 最新插入数据的自增长主键ID
+     */
+    public static int insertRow(Context context, BleOpenRecordBean bean) {
+        int ID = -1;
+        if (bean == null)
+            return ID;
+        SQLiteDatabase db = new SqliteHelper(context).getWritableDatabase();
+        db.beginTransaction();
+        try {
+            db.execSQL("INSERT INTO  " + tableName + " (userId,deviceId, deviceAddress, RSSI,scanTime,certificateIndex,openResult,reason,openConsumeTime,tag)  VALUES(?,?,?,?,?,?,?,?,?,?)", new Object[]{
+                    bean.userId, bean.deviceId, bean.deviceAddress, bean.RSSI, bean.scanTime, bean.certificateIndex, bean.openResult, bean.reason, bean.openConsumeTime, bean.tag
+            });
+            Cursor cursor = db.rawQuery("SELECT last_insert_rowid() FROM " + tableName, null);
+            if (cursor.moveToFirst()) {
+                ID = cursor.getInt(0);
+            }
+            db.setTransactionSuccessful();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            db.endTransaction();
+            db.close();
+        }
+        return ID;
     }
 }

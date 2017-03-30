@@ -39,5 +39,15 @@ public class SqliteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        //1  -> 2
+        //1 -> 3
+        for (int version = oldVersion + 1; version <= newVersion; version++) {
+            switch (version) {//版本号，依次按版本号处理
+                case 1:
+                    break;
+                case 2:
+                    break;
+            }
+        }
     }
 }

@@ -15,12 +15,14 @@ import com.revenco.database.bean.CertificateBean;
 import com.revenco.database.bean.StatisticalBean;
 import com.revenco.database.bean.UserBean;
 import com.revenco.database.buss.BleOpenRecordBuss;
+import com.revenco.database.helper.BussHelper;
 import com.revenco.database.buss.CertificateBuss;
 import com.revenco.database.buss.StatisticalBuss;
 import com.revenco.database.buss.UserBuss;
 import com.revenco.network.utils.HttpRequest;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * <p>PROJECT : AppBleSdk</p>
@@ -80,6 +82,27 @@ public class MainActivity extends AppCompatActivity {
                 certificateTest();
                 statisticalTest();
                 userTest();
+            }
+        });
+        findViewById(R.id.fanxingTest).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<UserBean> userBeen = BussHelper.queryAll(getApplicationContext(), UserBean.class, UserBuss.tableName);
+                for (UserBean userBean : userBeen) {
+                    System.out.println(userBean.toString());
+                }
+                List<StatisticalBean> statisticalBeen = BussHelper.queryAll(getApplicationContext(), StatisticalBean.class, StatisticalBuss.tableName);
+                for (StatisticalBean statisticalBean : statisticalBeen) {
+                    System.out.println(statisticalBean.toString());
+                }
+                List<CertificateBean> certificateBeen = BussHelper.queryAll(getApplicationContext(), CertificateBean.class, CertificateBuss.tableName);
+                for (CertificateBean certificateBean : certificateBeen) {
+                    System.out.println(certificateBean.toString());
+                }
+                List<BleOpenRecordBean> bleOpenRecordBeen = BussHelper.queryAll(getApplicationContext(), BleOpenRecordBean.class, BleOpenRecordBuss.tableName);
+                for (BleOpenRecordBean bleOpenRecordBean : bleOpenRecordBeen) {
+                    System.out.println(bleOpenRecordBean.toString());
+                }
             }
         });
     }

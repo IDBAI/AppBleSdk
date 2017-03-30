@@ -52,4 +52,17 @@
         android:layout_alignLeft="@+id/auto"
         android:layout_alignStart="@+id/auto"/>
 
+
+    <Button
+        android:id="@+id/fanxingTest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="泛型测试"
+        android:layout_alignBaseline="@+id/dataBaseTest"
+        android:layout_alignBottom="@+id/dataBaseTest"
+        android:layout_toRightOf="@+id/dataBaseTest"
+        android:layout_toEndOf="@+id/dataBaseTest"
+        android:layout_marginLeft="23dp"
+        android:layout_marginStart="23dp"/>
+
 </RelativeLayout>

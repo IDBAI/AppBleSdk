@@ -2,11 +2,9 @@ package com.revenco.blesdk;
 
 import com.revenco.blesdk.utils.ConvertUtil;
 import com.revenco.blesdk.utils.RSAUtils;
-import com.revenco.network.utils.HttpRequest;
 
 import junit.framework.TestSuite;
 
-import org.json.JSONObject;
 import org.junit.Test;
 
 import java.util.Map;
@@ -144,13 +142,12 @@ public class ExampleUnitTest extends TestSuite {
         /**
          http://app.utvgo.com:8099/utvgoClient/interfaces/content_listContent.action?channelId=6&pageNo=1&pageSize=30&typeId=0&keyWord=%E5%87%BA
          **/
-        HttpRequest httpRequest = new HttpRequest("http://app.utvgo.com:8099/utvgoClient/interfaces/content_listContent.action");
-        String[] key = {"channelId", "pageNo", "pageSize", "typeId", "keyWord"};
-        String[] values = {"6", "1", "30", "0", "%E5%87%BA"};
-        JSONObject jsonObject = httpRequest.geneJsonObj(key, values);
-        System.out.println(jsonObject.toString());
-        httpRequest.addParams(jsonObject);
-
+//        HttpRequest httpRequest = new HttpRequest("http://app.utvgo.com:8099/utvgoClient/interfaces/content_listContent.action");
+//        String[] key = {"channelId", "pageNo", "pageSize", "typeId", "keyWord"};
+//        String[] values = {"6", "1", "30", "0", "%E5%87%BA"};
+//        JSONObject jsonObject = httpRequest.geneJsonObj(key, values);
+//        System.out.println(jsonObject.toString());
+//        httpRequest.addParams(jsonObject);
 //        HashMap<String, String> hashMap = httpRequest.geneHashMap(key, values);
 //        httpRequest.addGetParams(hashMap);
 //        httpRequest.execut(null);

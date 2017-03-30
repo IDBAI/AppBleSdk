@@ -17,7 +17,7 @@ import com.revenco.database.helper.SqliteHelper;
  * <p>CLASS_VERSION : 1.0.0</p>
  */
 public class CertificateBuss {
-    private static String tableName = "Certificate";
+    public static String tableName = "Certificate";
 
     /**
      * 本地自增长ID

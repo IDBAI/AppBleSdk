@@ -17,7 +17,7 @@ import com.revenco.database.helper.SqliteHelper;
  * <p>CLASS_VERSION : 1.0.0</p>
  */
 public class UserBuss {
-    private static String tableName = "user";
+    public static String tableName = "user";
 
     public static void createTable(SQLiteDatabase db) {
         StringBuilder sb = new StringBuilder();

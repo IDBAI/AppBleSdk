@@ -294,7 +294,7 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
     }
 
     @Override
-    public void onStatusChange(iBeaconManager.GattStatusEnum statusEnum) {
+    public void onStatusChange(iBeaconManager.GattStatusEnum statusEnum, String... attr) {
         switch (statusEnum) {
             case GATT_STATUS_DISCONNECTTING:
                 XLog.d(TAG, "断开连接中...");
@@ -347,10 +347,6 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
                 text_Rssi.setText("rssi：" + rssi);
             }
         });
-    }
-
-    @Override
-    public void onReScan() {
     }
 
     @Override

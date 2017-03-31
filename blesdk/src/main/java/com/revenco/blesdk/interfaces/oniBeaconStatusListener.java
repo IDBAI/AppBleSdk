@@ -10,13 +10,11 @@ import com.revenco.blesdk.core.iBeaconManager;
  * 对外上层接口
  */
 public interface oniBeaconStatusListener {
-    void onIbeaconHadDetect(BluetoothDevice device,  ScanResult scanResult);
+    void onIbeaconHadDetect(BluetoothDevice device, ScanResult scanResult);
 
-    void onStatusChange(iBeaconManager.GattStatusEnum statusEnum);
+    void onStatusChange(iBeaconManager.GattStatusEnum statusEnum, String... attr);
 
     void onRssiCallback(double distance, int rssi);
-
-    void onReScan();
 
     void timeout();
 }

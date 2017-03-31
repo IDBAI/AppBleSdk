@@ -48,7 +48,7 @@ public class GattOperations {
             case CHAR_NOTIFY_STATUS_FAILED_VALUE:
                 //TODO 解析原因
                 if (listener != null)
-                    listener.onStatusChange(iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_FAILED);
+                    listener.onStatusChange(iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_FAILED, "这里是失败原因");
                 break;
         }
         isReceiveNotify = true;

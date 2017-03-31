@@ -33,6 +33,16 @@ public class BleOpenRecordBean implements Serializable {
      * 开门耗费时间
      */
     public float openConsumeTime;
+
+    public void setCurrentDate(String currentDate) {
+        this.currentDate = currentDate;
+    }
+
+    /**
+
+     * 当前时间
+     */
+    public String currentDate;
     /**
      * 保留字段
      */

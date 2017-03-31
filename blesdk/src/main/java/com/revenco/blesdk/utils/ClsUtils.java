@@ -42,7 +42,7 @@ public class ClsUtils {
         try {
             Method removeBondMethod = btClass.getDeclaredMethod("setPin", new Class[]{byte[].class});
             returnValue = (Boolean) removeBondMethod.invoke(btDevice, new Object[]{str.getBytes()});
-            XLog.d(TAG, "setPin is success " + btDevice.getAddress() + returnValue.booleanValue());
+            XLog.d(TAG, "setPin is result_success " + btDevice.getAddress() + returnValue.booleanValue());
         } catch (SecurityException e) {
             // throw new RuntimeException(e.getMessage());
             e.printStackTrace();
@@ -62,7 +62,7 @@ public class ClsUtils {
         Method createBondMethod = btClass.getMethod("cancelPairingUserInput");
         // cancelBondProcess()
         Boolean returnValue = (Boolean) createBondMethod.invoke(device);
-        XLog.d(TAG, "cancelPairingUserInput is success " + returnValue.booleanValue());
+        XLog.d(TAG, "cancelPairingUserInput is result_success " + returnValue.booleanValue());
         return returnValue.booleanValue();
     }
 

@@ -34,6 +34,7 @@ public class StatisticalBuss {
                 .append("averageRSSI INTEGER").append(",")
                 .append("averageOpenTime REAL").append(",")//REAL 存储float类型
                 .append("successRate  REAL").append(",")
+                .append("currentDate TEXT").append(",")
                 .append("tag TEXT").append(")");
         db.execSQL(sb.toString());
     }
@@ -50,8 +51,8 @@ public class StatisticalBuss {
         SQLiteDatabase db = new SqliteHelper(context).getWritableDatabase();
         db.beginTransaction();
         try {
-            db.execSQL("INSERT INTO  " + tableName + " (deviceId, deviceAddress, totalCount,successCount,timeoutCount,failedCount,averageRSSI,averageOpenTime,successRate,tag)  VALUES(?,?,?,?,?,?,?,?,?,?)", new Object[]{
-                    bean.deviceId, bean.deviceAddress, bean.totalCount, bean.successCount, bean.timeoutCount, bean.failedCount, bean.averageRSSI, bean.averageOpenTime, bean.successRate,bean.tag
+            db.execSQL("INSERT INTO  " + tableName + " (deviceId, deviceAddress, totalCount,successCount,timeoutCount,failedCount,averageRSSI,averageOpenTime,successRate,currentDate,tag)  VALUES(?,?,?,?,?,?,?,?,?,?,?)", new Object[]{
+                    bean.deviceId, bean.deviceAddress, bean.totalCount, bean.successCount, bean.timeoutCount, bean.failedCount, bean.averageRSSI, bean.averageOpenTime, bean.successRate,bean.currentDate,bean.tag
             });
             Cursor cursor = db.rawQuery("SELECT last_insert_rowid() FROM " + tableName, null);
             if (cursor.moveToFirst()) {

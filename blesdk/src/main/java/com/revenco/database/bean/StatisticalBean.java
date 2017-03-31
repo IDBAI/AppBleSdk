@@ -33,6 +33,15 @@ public class StatisticalBean implements Serializable {
      * 成功率
      */
     public float successRate;
+    public void setCurrentDate(String currentDate) {
+        this.currentDate = currentDate;
+    }
+
+    /**
+
+     * 当前时间
+     */
+    public String currentDate;
     /**
      * 保留字段
      */

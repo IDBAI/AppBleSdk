@@ -68,6 +68,14 @@ public class AssignValueForAttributeHelper {
         }
     }
 
+    /**
+     * 将成员变量转换为get/set方法 boolean 转换为is方法
+     *
+     * @param attribute
+     * @param objClass
+     * @param isSet
+     * @return
+     */
     private static String convertToMethodName(String attribute, Class objClass, boolean isSet) {
         /** 通过正则表达式来匹配第一个字符 **/
         Pattern p = Pattern.compile(REGEX);

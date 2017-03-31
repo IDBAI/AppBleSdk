@@ -59,14 +59,14 @@ public class BleBluetooth {
     }
 
     public synchronized void startBLEScan(oniBeaconStatusListener listener, long scanPeriod, long timeout) throws Exception {
-        XLog.d(TAG, "startBLEScan() called with: listener = [" + listener + "], scanPeriod = [" + scanPeriod + "], timeout = [" + timeout + "]");
+        XLog.d(TAG, "startBLEScan() called with: listener = [" + listener + "], scanPeriod = [" + scanPeriod + "], result_timeout = [" + timeout + "]");
         this.optionListener = listener;
         openBle();
         scan(listener, scanPeriod, timeout);
     }
 
     private synchronized void scan(oniBeaconStatusListener listener, long scanPeriod, long timeout) {
-        XLog.d(TAG, "scan() called with: listener = [" + listener + "], scanPeriod = [" + scanPeriod + "], timeout = [" + timeout + "]");
+        XLog.d(TAG, "scan() called with: listener = [" + listener + "], scanPeriod = [" + scanPeriod + "], result_timeout = [" + timeout + "]");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             XLog.d(TAG, "startBLEScan API > 21");
             scanCallOverLOLLIPOP.setListener(listener);
@@ -86,7 +86,7 @@ public class BleBluetooth {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                XLog.d("timeout", "first runnable.");
+                XLog.d("result_timeout", "first runnable.");
                 try {
                     if (isTimeout)
                         stopScan(true);
@@ -99,13 +99,13 @@ public class BleBluetooth {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                XLog.d("timeout", "run() called");
+                XLog.d("result_timeout", "run() called");
                 BleConnectGattCallback gattCallback = CallbackConnectHelper.getbleConnectGattCallback();
                 if (gattCallback != null) {
-                    XLog.d("timeout", "gattCallback.setTimeoutToStop();");
+                    XLog.d("result_timeout", "gattCallback.setTimeoutToStop();");
                     gattCallback.setTimeoutToStop();
                 } else {
-                    XLog.d("timeout", "gattCallback is null.");
+                    XLog.d("result_timeout", "gattCallback is null.");
                 }
             }
         }, timeout);

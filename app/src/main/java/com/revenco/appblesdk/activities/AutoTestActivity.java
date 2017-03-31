@@ -258,35 +258,8 @@ public class AutoTestActivity extends AppCompatActivity implements oniBeaconStat
     }
 
     @Override
-    public void onStatusChange(iBeaconManager.GattStatusEnum statusEnum) {
+    public void onStatusChange(iBeaconManager.GattStatusEnum statusEnum, String... attr) {
         switch (statusEnum) {
-            case GATT_STATUS_DISCONNECTTING:
-                XLog.d(TAG, "断开连接中...");
-                break;
-            case GATT_STATUS_DISCONNECTED:
-                XLog.d(TAG, "连接断开");
-                break;
-            case GATT_STATUS_CONNECTTING:
-                XLog.d(TAG, "连接中...");
-                break;
-            case GATT_STATUS_CONNECTED:
-                XLog.d(TAG, "已连接上");
-                break;
-            case GATT_STATUS_SERVICE_DISCOVERING:
-                XLog.d(TAG, "发现服务中...");
-                break;
-            case GATT_STATUS_SERVICE_DISCOVERED:
-                XLog.d(TAG, "服务被发现");
-                break;
-            case GATT_STATUS_SENDDING_DATA:
-                XLog.d(TAG, "发送数据中...");
-                break;
-            case GATT_STATUS_SENDDATA_SUCCESS:
-                XLog.d(TAG, "发送数据成功");
-                break;
-            case GATT_STATUS_SENDDATA_FAILED:
-                XLog.d(TAG, "发送数据失败");
-                break;
             case GATT_STATUS_NOTIFY_SUCCESS:
                 XLog.d(TAG, "开门成功！");
                 if (mHandler != null)
@@ -311,10 +284,6 @@ public class AutoTestActivity extends AppCompatActivity implements oniBeaconStat
                 text_Rssi.setText("rssi：" + rssi);
             }
         });
-    }
-
-    @Override
-    public void onReScan() {
     }
 
     @Override

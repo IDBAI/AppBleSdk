@@ -267,7 +267,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
 //                            publicMachineStatus( GATT_STATUS_DISCONNECTED);
 //                            reMoveAllMsgForTimeout();
 //                            if (listener != null)
-//                                listener.timeout();
+//                                listener.result_timeout();
 //                        }
                         timeoutFailure(false);
                         break;
@@ -446,11 +446,11 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     }
 
     private void timoutMethod() {
-        XLog.d("timeout", "timoutMethod() called.");
+        XLog.d("result_timeout", "timoutMethod() called.");
         reMoveAllMsgForTimeout();
         if (connectGatt != null) {
-            XLog.d(TAG, "timeout  -> connectGatt.close()");
-            XLog.d("timeout", "timeout  -> connectGatt.close()");
+            XLog.d(TAG, "result_timeout  -> connectGatt.close()");
+            XLog.d("result_timeout", "result_timeout  -> connectGatt.close()");
             closeAndRefresh();
         }
         if (listener != null)
@@ -732,12 +732,12 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         XLog.d(TAG, "onCharacteristicWrite() called with: connectGatt = [" + connectGatt + "], characteristic = [" + characteristic + "], status = [" + status + "]");
         String charUuid = characteristic.getUuid().toString();
         String hexStr = ConvertUtil.byte2HexStr(characteristic.getValue());
-        XLog.d("show-timeout", "onCharacteristicWrite() -> desUuid = " + charUuid + "\n" +
+        XLog.d("show-result_timeout", "onCharacteristicWrite() -> desUuid = " + charUuid + "\n" +
                 " hexStr = " + hexStr);
         if (status == BluetoothGatt.GATT_SUCCESS) {
             retry_logic_fail = 0;
             XLog.d(TAG, "onCharacteristicWrite succeed and set retry_logic_fail = 0.");
-            XLog.d(TAG, "CharacteristicUuid =" + characteristic.getUuid() + "  -> startWrite data success .");
+            XLog.d(TAG, "CharacteristicUuid =" + characteristic.getUuid() + "  -> startWrite data result_success .");
             onWriteDataSuccess(connectGatt, characteristic);
             DataHelper.getInstance().setUUIDHasWrited(charUuid.toUpperCase());
             DataHelper.getInstance().nextWrite(connectGatt);
@@ -745,7 +745,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             //写入失败，重试3次
             if (retry_logic_fail < LOGIC_FAILED_RETRY_MAX) {
                 retry_logic_fail++;
-                XLog.d(TAG, "onCharacteristicWrite logic failed,and retry it the " + retry_logic_fail + " times.");
+                XLog.d(TAG, "onCharacteristicWrite logic result_failed,and retry it the " + retry_logic_fail + " times.");
                 DataHelper.getInstance().doWrite(connectGatt, characteristic);
             } else
                 onWriteDataFailure(new GattException(connectGatt, status));
@@ -761,7 +761,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             String hexStr = ConvertUtil.byte2HexStr(value);
             String string = "onCharacteristicChanged -> charUuid = " + characteristic.getUuid().toString() + "   receive:" + hexStr;
             XLog.d(TAG, string);
-            XLog.d("show-timeout", string);
+            XLog.d("show-result_timeout", string);
             NotifyHelper.getInstance().debuginfo(string);
             if (!isReceiveNotify) {
                 XLog.e(TAG, "1 、 first receive notify!");
@@ -801,7 +801,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             //写入失败，重试3次
             if (retry_logic_fail < LOGIC_FAILED_RETRY_MAX) {
                 retry_logic_fail++;
-                XLog.d(TAG, "onDescriptorWrite logic failed,and retry it the " + retry_logic_fail + " times.");
+                XLog.d(TAG, "onDescriptorWrite logic result_failed,and retry it the " + retry_logic_fail + " times.");
                 DataHelper.getInstance().doWrite(connectGatt, descriptor);
             } else
                 onWriteDataFailure(new GattException(connectGatt, status));
@@ -880,7 +880,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     public void setTimeoutToStop() {
         reMoveAllMsgForTimeout();
         if (isReceiveNotify) {
-            XLog.d("timeout", "isReceiveNotify is true,return.");
+            XLog.d("result_timeout", "isReceiveNotify is true,return.");
             return;
         }
         //如果发送完成数据了，允许再等待100ms，等待notify，提高app开锁成功率，再执行timeout逻辑
@@ -893,26 +893,26 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             }
             XLog.w(TAG, "超时，但是发送数据完成，开始等待100ms------end");
         }
-        XLog.d("timeout", "setTimeoutToStop() called");
+        XLog.d("result_timeout", "setTimeoutToStop() called");
         isTimeout = true;
-        XLog.d("timeout", "currentGattStatus = " + currentGattStatus.toString());
+        XLog.d("result_timeout", "currentGattStatus = " + currentGattStatus.toString());
         if (currentGattStatus != GATT_STATUS_DISCONNECTED
                 && currentGattStatus != GATT_STATUS_CONNECTTING) {//已经连接上
             if (connectGatt != null) {
                 XLog.d(TAG, "//已经连接上");
-                XLog.d("timeout", "connectGatt.disconnect();");
+                XLog.d("result_timeout", "connectGatt.disconnect();");
                 connectGatt.disconnect();
             }
         } else {
-            XLog.d("timeout", "timoutMethod() called.");
+            XLog.d("result_timeout", "timoutMethod() called.");
             reMoveAllMsgForTimeout();
             if (connectGatt != null) {//处于未连接状态
                 XLog.d(TAG, "处于未连接状态");
-                XLog.d(TAG, "timeout  -> connectGatt.disconnect()");
-                XLog.d("timeout", "timeout  -> connectGatt.disconnect()");
+                XLog.d(TAG, "result_timeout  -> connectGatt.disconnect()");
+                XLog.d("result_timeout", "result_timeout  -> connectGatt.disconnect()");
                 connectGatt.disconnect();
-                XLog.d(TAG, "timeout  -> connectGatt.close()");
-                XLog.d("timeout", "timeout  -> connectGatt.close()");
+                XLog.d(TAG, "result_timeout  -> connectGatt.close()");
+                XLog.d("result_timeout", "result_timeout  -> connectGatt.close()");
                 closeAndRefresh();
             }
             if (listener != null)

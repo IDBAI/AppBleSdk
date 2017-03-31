@@ -34,6 +34,7 @@ public class BleOpenRecordBuss {
                 .append("openResult TEXT").append(",")
                 .append("reason TEXT").append(",")
                 .append("openConsumeTime REAL").append(",")
+                .append("currentDate TEXT").append(",")
                 .append("tag TEXT").append(")");
         db.execSQL(sb.toString());
     }
@@ -50,8 +51,8 @@ public class BleOpenRecordBuss {
         SQLiteDatabase db = new SqliteHelper(context).getWritableDatabase();
         db.beginTransaction();
         try {
-            db.execSQL("INSERT INTO  " + tableName + " (userId,deviceId, deviceAddress, RSSI,scanTime,certificateIndex,openResult,reason,openConsumeTime,tag)  VALUES(?,?,?,?,?,?,?,?,?,?)", new Object[]{
-                    bean.userId, bean.deviceId, bean.deviceAddress, bean.RSSI, bean.scanTime, bean.certificateIndex, bean.openResult, bean.reason, bean.openConsumeTime, bean.tag
+            db.execSQL("INSERT INTO  " + tableName + " (userId,deviceId, deviceAddress, RSSI,scanTime,certificateIndex,openResult,reason,openConsumeTime,currentDate,tag)  VALUES(?,?,?,?,?,?,?,?,?,?,?)", new Object[]{
+                    bean.userId, bean.deviceId, bean.deviceAddress, bean.RSSI, bean.scanTime, bean.certificateIndex, bean.openResult, bean.reason, bean.openConsumeTime, bean.currentDate,bean.tag
             });
             Cursor cursor = db.rawQuery("SELECT last_insert_rowid() FROM " + tableName, null);
             if (cursor.moveToFirst()) {

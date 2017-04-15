@@ -48,11 +48,11 @@ public class BleOpenRecordBuss {
         int ID = -1;
         if (bean == null)
             return ID;
-        SQLiteDatabase db = new SqliteHelper(context).getWritableDatabase();
+        SQLiteDatabase db = SqliteHelper.getInstance(context).getWritableDatabase();
         db.beginTransaction();
         try {
             db.execSQL("INSERT INTO  " + tableName + " (userId,deviceId, deviceAddress, RSSI,scanTime,certificateIndex,openResult,reason,openConsumeTime,currentDate,tag)  VALUES(?,?,?,?,?,?,?,?,?,?,?)", new Object[]{
-                    bean.userId, bean.deviceId, bean.deviceAddress, bean.RSSI, bean.scanTime, bean.certificateIndex, bean.openResult, bean.reason, bean.openConsumeTime, bean.currentDate,bean.tag
+                    bean.userId, bean.deviceId, bean.deviceAddress, bean.RSSI, bean.scanTime, bean.certificateIndex, bean.openResult, bean.reason, bean.openConsumeTime, bean.currentDate, bean.tag
             });
             Cursor cursor = db.rawQuery("SELECT last_insert_rowid() FROM " + tableName, null);
             if (cursor.moveToFirst()) {

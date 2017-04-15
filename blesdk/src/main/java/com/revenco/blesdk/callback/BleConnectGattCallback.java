@@ -106,6 +106,14 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     private BluetoothGatt connectGatt;
     private boolean isTimeout = false;
 
+    /**
+     * 构造方法实例化Handler thread，避免创建无数个thread
+     */
+    public BleConnectGattCallback() {
+        //create handler in thread.
+        inithandler();
+    }
+
     public oniBeaconStatusListener getListener() {
         return listener;
     }
@@ -116,8 +124,6 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         this.listener = listener;
         this.device = device;
         isTimeout = false;
-        //create handler in thread.
-        inithandler();
         resetCounter();
         resetWriting();
         initparams();
@@ -182,7 +188,6 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         HandlerThread thread = new HandlerThread("timeoutlooper");
         thread.start();
         mHandler = new Handler(thread.getLooper(), new Handler.Callback() {
-            private BluetoothGatt firstConnectGatt;
             private TransData transData;
 
             @Override
@@ -227,9 +232,9 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
                         if (retry_discovered_service < RETRY_DISCOVER_SERVICE_MAX) {
                             retry_discovered_service++;
                             XLog.d(TAG, "retry_discovered_service = " + retry_discovered_service);
-                            if (firstConnectGatt != null) {
+                            if (connectGatt != null) {
                                 XLog.d(TAG, "发现服务超时，重试！");
-                                boolean discoverServices = firstConnectGatt.discoverServices();
+                                boolean discoverServices = connectGatt.discoverServices();
                                 //当discoverServices为false的时候重试3次
                                 retryDiscoverServicesIfFalse(discoverServices);
                                 XLog.d(TAG, "discoverServices = " + discoverServices);

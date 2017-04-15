@@ -30,6 +30,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static com.revenco.blesdk.core.iBeaconManager.OpenResult.result_failed;
 
@@ -79,6 +81,7 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
      */
     private long startmsTime;
     private long scanConsumeTime;
+    private ExecutorService singleThreadExecutor;
 
     public static iBeaconManager getInstance() {
         if (INSTANCE == null)
@@ -123,6 +126,7 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
      */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public boolean init(Context context, oniBeaconStatusListener listener) {
+        singleThreadExecutor = Executors.newSingleThreadExecutor();
         this.listener = listener;
         this.context = context;
         initHandler();
@@ -166,16 +170,26 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
         });
     }
 
+    /**
+     * 放置子线程中，使用了单个线程的线程池
+     */
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public void startScan() {
-        if (bleBluetooth != null) {
-            try {
-                startmsTime = SystemClock.elapsedRealtime();
-                bleBluetooth.startBLEScan(this, SCAN_PERIOD, TIMEOUT);
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (singleThreadExecutor == null)
+            singleThreadExecutor = Executors.newSingleThreadExecutor();
+        singleThreadExecutor.execute(new Runnable() {
+            @Override
+            public void run() {
+                if (bleBluetooth != null) {
+                    try {
+                        startmsTime = SystemClock.elapsedRealtime();
+                        bleBluetooth.startBLEScan(iBeaconManager.this, SCAN_PERIOD, TIMEOUT);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        }
+        });
     }
 
     @Override

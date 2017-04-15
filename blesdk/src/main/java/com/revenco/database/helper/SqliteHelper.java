@@ -20,6 +20,7 @@ public class SqliteHelper extends SQLiteOpenHelper {
     private static final int VERSION_CODE = 1;
     private static final String DBNAME = "ble.db";
     private static final String TAG = "SqliteHelper";
+    private static SqliteHelper INSTANCE;
 
     public SqliteHelper(Context context) {
         this(context, DBNAME, null, VERSION_CODE);
@@ -27,6 +28,12 @@ public class SqliteHelper extends SQLiteOpenHelper {
 
     public SqliteHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
+    }
+
+    public static synchronized SqliteHelper getInstance(Context context) {
+        if (INSTANCE == null)
+            INSTANCE = new SqliteHelper(context);
+        return INSTANCE;
     }
 
     @Override

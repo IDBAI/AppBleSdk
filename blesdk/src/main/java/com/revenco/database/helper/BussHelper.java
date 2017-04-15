@@ -26,7 +26,7 @@ public class BussHelper {
      */
     public static <T> List<T> queryAll(Context context, Class<T> javaBeanClass, String tableName) {
         List<T> list = new ArrayList<>();
-        SQLiteDatabase db = new SqliteHelper(context).getReadableDatabase();
+        SQLiteDatabase db =  SqliteHelper.getInstance(context).getReadableDatabase();
         T bean;
         Cursor cursor = null;
         try {

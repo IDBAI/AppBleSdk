@@ -172,6 +172,7 @@ public class AutoTestActivity extends AppCompatActivity implements oniBeaconStat
         XLog.d(TAG, "onDestroy() called");
         destoryAutoTest();
         destoryBleGatt();
+        iBeaconManager.getInstance().destoryListener();
     }
 
     private void destoryAutoTest() {
@@ -179,6 +180,8 @@ public class AutoTestActivity extends AppCompatActivity implements oniBeaconStat
             timer.cancel();
         if (task != null)
             task.cancel();
+        timer = null;
+        task = null;
     }
 
     private void initSensorValues() {
@@ -336,7 +339,7 @@ public class AutoTestActivity extends AppCompatActivity implements oniBeaconStat
                     //发出提示音
                     activity.mSoundPool.play(activity.mWeShareOpenSucceed, 1, 1, 0, 0, 1);
                     Toast.makeText(activity.getApplication(), "开门成功！", Toast.LENGTH_SHORT).show();
-                    activity.editTime.append("[" + dateString + "] succeed : " + inval + "s\n");
+//                    activity.editTime.append("[" + dateString + "] succeed : " + inval + "s\n");
                     activity.text_succeed.setText("成功：" + (++activity.succeed) + "次");
                     float rate = (activity.succeed * 1.0f / (activity.succeed + activity.failure + activity.timeout)) * 100.0f;
                     activity.text_rate.setText("成功率：" + rate + "%");
@@ -356,7 +359,7 @@ public class AutoTestActivity extends AppCompatActivity implements oniBeaconStat
                     //发出提示音
                     activity.mSoundPool.play(activity.mWeShareOpenFailure, 1, 1, 0, 0, 1);
                     Toast.makeText(activity.getApplication(), "开门失败！", Toast.LENGTH_SHORT).show();
-                    activity.editTime.append("[" + dateString + "] failure : " + inval + "s\n");
+//                    activity.editTime.append("[" + dateString + "] failure : " + inval + "s\n");
                     activity.text_failure.setText("失败：" + (++activity.failure) + "次");
                     float rate1 = (activity.succeed * 1.0f / (activity.succeed + activity.failure + activity.timeout)) * 100.0f;
                     activity.text_rate.setText("成功率：" + rate1 + "%");
@@ -374,7 +377,7 @@ public class AutoTestActivity extends AppCompatActivity implements oniBeaconStat
                     //发出提示音
                     activity.mSoundPool.play(activity.mWeShareOpenTimeout, 1, 1, 0, 0, 1);
                     Toast.makeText(activity.getApplication(), "开门超时！", Toast.LENGTH_SHORT).show();
-                    activity.editTime.append("[" + dateString + "] timeout : " + inval + "s\n");
+//                    activity.editTime.append("[" + dateString + "] timeout : " + inval + "s\n");
                     activity.text_timeout.setText("超时：" + (++activity.timeout) + "次");
                     float rate2 = (activity.succeed * 1.0f / (activity.succeed + activity.failure + activity.timeout)) * 100.0f;
                     activity.text_rate.setText("成功率：" + rate2 + "%");

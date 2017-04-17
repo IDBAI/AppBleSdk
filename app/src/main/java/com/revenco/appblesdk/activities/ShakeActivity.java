@@ -152,6 +152,7 @@ public class ShakeActivity extends AppCompatActivity implements SensorEventListe
         super.onDestroy();
         XLog.d(TAG, "onDestroy() called");
         destoryBleGatt();
+        iBeaconManager.getInstance().destoryListener();
     }
 
     private void unRegistSensor() {

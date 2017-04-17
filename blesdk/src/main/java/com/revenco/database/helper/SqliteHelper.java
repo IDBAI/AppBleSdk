@@ -32,7 +32,7 @@ public class SqliteHelper extends SQLiteOpenHelper {
 
     public static synchronized SqliteHelper getInstance(Context context) {
         if (INSTANCE == null)
-            INSTANCE = new SqliteHelper(context);
+            INSTANCE = new SqliteHelper(context.getApplicationContext());
         return INSTANCE;
     }
 

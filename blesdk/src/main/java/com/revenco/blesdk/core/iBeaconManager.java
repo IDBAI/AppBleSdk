@@ -120,6 +120,13 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
     }
 
     /**
+     * 销毁listener，防止引起内存泄露
+     */
+    public void destoryListener() {
+        this.listener = null;
+    }
+
+    /**
      * @param context
      * @param listener
      * @return
@@ -128,7 +135,7 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
     public boolean init(Context context, oniBeaconStatusListener listener) {
         singleThreadExecutor = Executors.newSingleThreadExecutor();
         this.listener = listener;
-        this.context = context;
+        this.context = context.getApplicationContext();
         initHandler();
         bleBluetooth = BleBluetooth.getInStance();
         bleBluetooth.init(context, this);
@@ -342,7 +349,7 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
                 bean.deviceId = "none";
                 bean.userId = "测试";
                 int id = BleOpenRecordBuss.insertRow(context, bean);
-                if (id % 5 == 0) {
+                if (id % 20 == 0) {
                     //批量统计
                     List<BleOpenRecordBean> bleOpenRecordBeen = BussHelper.queryAll(context, BleOpenRecordBean.class, BleOpenRecordBuss.tableName);
                     int successCount = 0, failedCount = 0, timeoutCount = 0;

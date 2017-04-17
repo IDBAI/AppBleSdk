@@ -3,6 +3,8 @@ package com.revenco.appblesdk;
 import android.app.Application;
 
 import com.revenco.appblesdk.utils.CrashHandler;
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 
 /**
  * Created by Administrator on 2016/12/21.
@@ -41,6 +43,7 @@ public class BleApplication extends Application {
     public void onCreate() {
         super.onCreate();
         crashHandler = CrashHandler.getInstance();
-//        craashHandler.init(getApplicationContext());
+        crashHandler.init(getApplicationContext());
+        RefWatcher refWatcher = LeakCanary.install(this);
     }
 }

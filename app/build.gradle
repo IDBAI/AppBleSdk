@@ -30,4 +30,8 @@ dependencies {
     compile project(':blesdk')
     compile 'com.android.support:appcompat-v7:25.0.0'
     compile 'com.github.dfqin:grantor:1.0.1'
+
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.6-SNAPSHOT'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.6-SNAPSHOT'
+
 }

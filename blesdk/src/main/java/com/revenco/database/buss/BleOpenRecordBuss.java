@@ -19,7 +19,7 @@ import com.revenco.database.helper.SqliteHelper;
 public class BleOpenRecordBuss {
     public static final String tableName = "BleOpenRecord";
 
-    public static void createTable(SQLiteDatabase db) {
+    public synchronized static void createTable(SQLiteDatabase db) {
         StringBuilder sb = new StringBuilder();
         sb.append(SqlStatementHelper.CreateTablePre)
                 .append(tableName)
@@ -44,7 +44,7 @@ public class BleOpenRecordBuss {
      * @param bean
      * @return 返回 最新插入数据的自增长主键ID
      */
-    public static int insertRow(Context context, BleOpenRecordBean bean) {
+    public synchronized static int insertRow(Context context, BleOpenRecordBean bean) {
         int ID = -1;
         if (bean == null)
             return ID;

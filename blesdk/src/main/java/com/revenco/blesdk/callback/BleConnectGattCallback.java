@@ -55,7 +55,6 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     private static final int MSG_SERVICE_DISCOVER = 105;
     private static final int MSG_NEW_GATT_RECONNECT = 107;
     private static final int MSG_COMMING_TIMEOUT = 108;
-    private static final int MSG_BELOW_LOLLIPOP_RECONNECT_LAST_DEVICE = 200;
     //
     private static final int RETRY_READ_RSSI_MAX = 3;//读远程RSSI，最大重试次数
     private static final int RETRY_CONNECT_MAX = 2;//connectGatt 直接重连，可尝试最大次数
@@ -254,15 +253,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
                         if (isLegalTimeOut(msg.what))
                             timeoutFailure(false);
                         break;
-                    case MSG_BELOW_LOLLIPOP_RECONNECT_LAST_DEVICE:
-                        if (transData == null) {
-                            XLog.d(TAG, "mHandler -> transData is null.");
-                            break;
-                        }
-                        XLog.d(TAG, "below 5.0 OS ,reConnect last Device Timeout.");
-                        //超时
-                        finallySetTimeout();
-                        break;
+
                     case MSG_COMMING_TIMEOUT://首次进来连接超时
 //                        if (connectGatt != null) {
 //                            if (publicMachineStatus( GATT_STATUS_DISCONNECTTING))
@@ -324,7 +315,6 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         XLog.d(TAG, "onConnectionStateChange() called with: connectGatt = [" + connectGatt + "], status = [" + status + "], newState = [" + newState + "]");
         resetWriting();
         mHandler.removeMessages(MSG_COMMING_TIMEOUT);//首次进入连接超时，失败与否都要移除
-        mHandler.removeMessages(MSG_BELOW_LOLLIPOP_RECONNECT_LAST_DEVICE);//移除5.0以下系统重新连接上一个的消息,成功失败都需要移除
         if (newState == BluetoothGatt.STATE_CONNECTED) {
             onConnectSuccess(connectGatt, status, newState);
         } else if (newState == BluetoothGatt.STATE_DISCONNECTED) {
@@ -584,7 +574,6 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             mHandler.removeMessages(MSG_GATT_RECONNECT);
             mHandler.removeMessages(MSG_SERVICE_DISCOVER);
             mHandler.removeMessages(MSG_NEW_GATT_RECONNECT);
-            mHandler.removeMessages(MSG_BELOW_LOLLIPOP_RECONNECT_LAST_DEVICE);
             mHandler.removeMessages(MSG_COMMING_TIMEOUT);
         }
     }

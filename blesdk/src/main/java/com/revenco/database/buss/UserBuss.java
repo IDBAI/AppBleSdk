@@ -19,7 +19,7 @@ import com.revenco.database.helper.SqliteHelper;
 public class UserBuss {
     public static String tableName = "user";
 
-    public static void createTable(SQLiteDatabase db) {
+    public synchronized static void createTable(SQLiteDatabase db) {
         StringBuilder sb = new StringBuilder();
         sb.append(SqlStatementHelper.CreateTablePre)
                 .append(tableName)
@@ -37,15 +37,15 @@ public class UserBuss {
      * @param bean
      * @return 返回 最新插入数据的自增长主键ID
      */
-    public static int insertRow(Context context, UserBean bean) {
+    public synchronized static int insertRow(Context context, UserBean bean) {
         int ID = -1;
         if (bean == null)
             return ID;
-        SQLiteDatabase db =  SqliteHelper.getInstance(context).getWritableDatabase();
+        SQLiteDatabase db = SqliteHelper.getInstance(context).getWritableDatabase();
         db.beginTransaction();
         try {
             db.execSQL("INSERT INTO  " + tableName + " (userId, mobileNum, communityId,tag)  VALUES(?,?,?,?)", new Object[]{
-                    bean.userId, bean.mobileNum, bean.communityId,bean.tag
+                    bean.userId, bean.mobileNum, bean.communityId, bean.tag
             });
             Cursor cursor = db.rawQuery("SELECT last_insert_rowid() FROM " + tableName, null);
             if (cursor.moveToFirst()) {

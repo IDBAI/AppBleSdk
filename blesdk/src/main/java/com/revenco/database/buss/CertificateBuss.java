@@ -23,7 +23,7 @@ public class CertificateBuss {
      * 本地自增长ID
      * ID , Index , deviceId ,deviceAddress, appBleMac , Content , Tag ,
      */
-    public static void createTable(SQLiteDatabase db) {
+    public  synchronized static void createTable(SQLiteDatabase db) {
         StringBuilder sb = new StringBuilder();
         sb.append(SqlStatementHelper.CreateTablePre)
                 .append(tableName)
@@ -43,7 +43,7 @@ public class CertificateBuss {
      * @param bean
      * @return 返回 最新插入数据的自增长主键ID
      */
-    public static int insertRow(Context context, CertificateBean bean) {
+    public synchronized static int insertRow(Context context, CertificateBean bean) {
         int ID = -1;
         if (bean == null)
             return ID;

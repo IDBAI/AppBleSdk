@@ -18,15 +18,17 @@ import java.util.List;
  */
 public class BussHelper {
     /**
+     * 需要添加 方法锁 synchronized 确保多线程环境下安全
+     *
      * @param context
      * @param javaBeanClass 需要转换的为的对象
      * @param tableName     对应的SQLite数据库的表名
      * @param <T>           返回一个 javaBeanClass 对应的列表
      * @return
      */
-    public static <T> List<T> queryAll(Context context, Class<T> javaBeanClass, String tableName) {
+    public synchronized static <T> List<T> queryAll(Context context, Class<T> javaBeanClass, String tableName) {
         List<T> list = new ArrayList<>();
-        SQLiteDatabase db =  SqliteHelper.getInstance(context).getReadableDatabase();
+        SQLiteDatabase db = SqliteHelper.getInstance(context).getReadableDatabase();
         T bean;
         Cursor cursor = null;
         try {
@@ -57,7 +59,7 @@ public class BussHelper {
      * @param cursor
      * @param <T>
      */
-    private static <T> void bindValues(T bean, Cursor cursor) {
+    private synchronized static <T> void bindValues(T bean, Cursor cursor) {
         Class<?> aClass = bean.getClass();
         Field[] fields = aClass.getDeclaredFields();
         for (Field field : fields) {

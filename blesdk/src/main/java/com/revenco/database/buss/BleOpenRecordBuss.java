@@ -48,7 +48,7 @@ public class BleOpenRecordBuss {
         int ID = -1;
         if (bean == null)
             return ID;
-        SQLiteDatabase db = SqliteHelper.getInstance(context).getWritableDatabase();
+        SQLiteDatabase db = SqliteHelper.getInstance(context).getWriteable();
         db.beginTransaction();
         try {
             db.execSQL("INSERT INTO  " + tableName + " (userId,deviceId, deviceAddress, RSSI,scanTime,certificateIndex,openResult,reason,openConsumeTime,currentDate,tag)  VALUES(?,?,?,?,?,?,?,?,?,?,?)", new Object[]{
@@ -63,7 +63,7 @@ public class BleOpenRecordBuss {
             e.printStackTrace();
         } finally {
             db.endTransaction();
-            db.close();
+            SqliteHelper.getInstance(context).safeCloseDB();
         }
         return ID;
     }

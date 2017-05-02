@@ -89,7 +89,7 @@ public class CallbackConnectHelper {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            XLog.d(TAG, "closeGatt() -> connectGatt.close()");
+            XLog.d(TAG, "closeGatt() -> connectGatt.safeCloseDB()");
             connectGatt.close();
         }
     }

@@ -41,7 +41,7 @@ public class UserBuss {
         int ID = -1;
         if (bean == null)
             return ID;
-        SQLiteDatabase db = SqliteHelper.getInstance(context).getWritableDatabase();
+        SQLiteDatabase db = SqliteHelper.getInstance(context).getWriteable();
         db.beginTransaction();
         try {
             db.execSQL("INSERT INTO  " + tableName + " (userId, mobileNum, communityId,tag)  VALUES(?,?,?,?)", new Object[]{
@@ -56,7 +56,7 @@ public class UserBuss {
             e.printStackTrace();
         } finally {
             db.endTransaction();
-            db.close();
+            SqliteHelper.getInstance(context).safeCloseDB();
         }
         return ID;
     }

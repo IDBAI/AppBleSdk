@@ -406,7 +406,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         }
         mHandler.removeMessages(MSG_CLOSE_GATT_CONNECT);//移除关闭gatt连接的消息
         if (!GattStatusMachine.publicMachineStatus(listener, GATT_STATUS_DISCONNECTED)) {
-            XLog.d(TAG, "connectGatt.close();");
+            XLog.d(TAG, "connectGatt.safeCloseDB();");
             closeAndRefresh();
             return;
         }
@@ -415,7 +415,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         //如果可以的话，先Reconnect，直到超过最大次数
         if (retry_gatt_reconnect < RETRY_CONNECT_MAX) {
             if (isFinishSendData) {
-                XLog.d(TAG, "数据发送完成!已经断开了连接，不判断 isReceiveNotify，connectGatt.close();");
+                XLog.d(TAG, "数据发送完成!已经断开了连接，不判断 isReceiveNotify，connectGatt.safeCloseDB();");
                 closeAndRefresh();
             } else {
                 XLog.d(TAG, "数据未发送完成，onConnectFailure ->ReConnectGatt()");
@@ -424,7 +424,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         } else {
             //reconnect超过最大次数，尝试new 出新的gatt对象。
             if (connectGatt != null) {
-                XLog.d(TAG, "onConnectFailure  -> connectGatt.close()");
+                XLog.d(TAG, "onConnectFailure  -> connectGatt.safeCloseDB()");
                 closeAndRefresh();
             }
             if (!isFinishSendData) {//数据未发送完成
@@ -444,8 +444,8 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         XLog.d("result_timeout", "timoutMethod() called.");
         reMoveAllMsgForTimeout();
         if (connectGatt != null) {
-            XLog.d(TAG, "result_timeout  -> connectGatt.close()");
-            XLog.d("result_timeout", "result_timeout  -> connectGatt.close()");
+            XLog.d(TAG, "result_timeout  -> connectGatt.safeCloseDB()");
+            XLog.d("result_timeout", "result_timeout  -> connectGatt.safeCloseDB()");
             closeAndRefresh();
         }
         if (listener != null)
@@ -471,7 +471,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     /**
      * 超时重新连接，请勿close，新建对象之前必须要close上一个gatt以释放资源
      * * connect 对应 disconnect ,
-     * close 对应  device.connectGatt(context, true, this) 新建对象
+     * safeCloseDB 对应  device.connectGatt(context, true, this) 新建对象
      * 重连方案
      */
     private void ReConnectGatt() {
@@ -502,7 +502,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         } else {
             XLog.d(TAG, "retry_gatt_reconnect 超过最大重试次数");
             if (connectGatt != null) {
-                XLog.d(TAG, "newGattReConnect() 之前 connectGatt.close();");
+                XLog.d(TAG, "newGattReConnect() 之前 connectGatt.safeCloseDB();");
                 closeAndRefresh();
             }
             newGattReConnect();
@@ -511,7 +511,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
 
     /**
      * connect 对应 disconnect ,
-     * close 对应  device.connectGatt(context, true, this) 新建对象
+     * safeCloseDB 对应  device.connectGatt(context, true, this) 新建对象
      * 新建对象重连方案
      */
     private void newGattReConnect() {
@@ -555,7 +555,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            XLog.d(TAG, "finallySetTimeout() -> connectGatt.close()");
+            XLog.d(TAG, "finallySetTimeout() -> connectGatt.safeCloseDB()");
             closeAndRefresh();
         }
         reMoveAllMsgForTimeout();
@@ -905,8 +905,8 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
                 XLog.d(TAG, "result_timeout  -> connectGatt.disconnect()");
                 XLog.d("result_timeout", "result_timeout  -> connectGatt.disconnect()");
                 connectGatt.disconnect();
-                XLog.d(TAG, "result_timeout  -> connectGatt.close()");
-                XLog.d("result_timeout", "result_timeout  -> connectGatt.close()");
+                XLog.d(TAG, "result_timeout  -> connectGatt.safeCloseDB()");
+                XLog.d("result_timeout", "result_timeout  -> connectGatt.safeCloseDB()");
                 closeAndRefresh();
             }
             if (listener != null)

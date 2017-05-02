@@ -28,7 +28,8 @@ public class BussHelper {
      */
     public synchronized static <T> List<T> queryAll(Context context, Class<T> javaBeanClass, String tableName) {
         List<T> list = new ArrayList<>();
-        SQLiteDatabase db = SqliteHelper.getInstance(context).getReadableDatabase();
+        SQLiteDatabase db = SqliteHelper.getInstance(context).getReadable();
+        db.beginTransaction();
         T bean;
         Cursor cursor = null;
         try {
@@ -38,6 +39,7 @@ public class BussHelper {
                 bindValues(bean, cursor);
                 list.add(bean);
             }
+            db.setTransactionSuccessful();
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (InstantiationException e) {
@@ -47,7 +49,8 @@ public class BussHelper {
         } finally {
             if (cursor != null)
                 cursor.close();
-            db.close();
+            db.endTransaction();
+            SqliteHelper.getInstance(context).safeCloseDB();
         }
         return list;
     }

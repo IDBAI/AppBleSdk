@@ -284,6 +284,9 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
             case GATT_STATUS_SENDDATA_FAILED:
                 XLog.d(TAG, "发送数据失败");
                 break;
+            case GATT_STATUS_WAITTING_NOTIFY:
+                XLog.d(TAG, "等待通知中...");
+                break;
             case GATT_STATUS_NOTIFY_SUCCESS:
                 XLog.d(TAG, "开门成功！");
                 saveStatisticalData(OpenResult.result_success);
@@ -400,6 +403,7 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
         GATT_STATUS_SENDDATA_SUCCESS,
         GATT_STATUS_SENDDATA_FAILED,
         //
+        GATT_STATUS_WAITTING_NOTIFY,
         GATT_STATUS_NOTIFY_SUCCESS,
         GATT_STATUS_NOTIFY_FAILED,
     }

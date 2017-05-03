@@ -4,10 +4,11 @@ import android.bluetooth.BluetoothGatt;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
-import com.revenco.blesdk.interfaces.oniBeaconStatusListener;
+import com.revenco.blesdk.callback.CallbackConnectHelper;
 import com.revenco.blesdk.utils.XLog;
 
-import static com.revenco.blesdk.callback.BleConnectGattCallback.isReceiveNotify;
+import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_FAILED;
+import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_SUCCESS;
 
 /**
  * <p>PROJECT : WeShare</p>
@@ -38,20 +39,18 @@ public class GattOperations {
      * @param gatt
      * @param values
      */
-    public static void dealNotify(BluetoothGatt gatt, byte[] values, oniBeaconStatusListener listener) {
+    public static void dealNotify(BluetoothGatt gatt, byte[] values) {
         switch (values[0]) {
             case CHAR_NOTIFY_STATUS_SUCCESS_VALUE:
                 XLog.d(TAG, "开门成功！");
-                if (listener != null)
-                    listener.onStatusChange(iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_SUCCESS);
+                GattStatusMachine.publicMachineStatus(CallbackConnectHelper.getbleConnectGattCallback().getListener(), GATT_STATUS_NOTIFY_SUCCESS);
                 break;
             case CHAR_NOTIFY_STATUS_FAILED_VALUE:
                 //TODO 解析原因
-                if (listener != null)
-                    listener.onStatusChange(iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_FAILED, "这里是失败原因");
+                GattStatusMachine.publicMachineStatus(CallbackConnectHelper.getbleConnectGattCallback().getListener(), GATT_STATUS_NOTIFY_FAILED, "这里是失败原因");
                 break;
         }
-        isReceiveNotify = true;
+//        isReceiveNotify = true;
         XLog.d(TAG, "处理通知操作 -->  gatt.disconnect();");
         gatt.disconnect();
     }

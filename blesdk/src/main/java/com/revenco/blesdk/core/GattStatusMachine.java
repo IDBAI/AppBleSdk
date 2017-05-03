@@ -13,6 +13,7 @@ import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_SENDDING_DATA;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_SERVICE_DISCOVERED;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_SERVICE_DISCOVERING;
+import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_WAITTING_NOTIFY;
 
 /**
  * <p>PROJECT : WeShare</p>
@@ -31,7 +32,7 @@ public class GattStatusMachine {
      * @param newStatus
      * @return true:正常合法运行，false：非法状态转移，不能处理。
      */
-    public static synchronized boolean publicMachineStatus(oniBeaconStatusListener listener, iBeaconManager.GattStatusEnum newStatus) {
+    public static synchronized boolean publicMachineStatus(oniBeaconStatusListener listener, iBeaconManager.GattStatusEnum newStatus, String... attr) {
         XLog.d(TAG, "publicMachineStatus() called with: newStatus = [" + newStatus + "]");
         boolean isLegal = true;
         switch (newStatus) {
@@ -43,6 +44,7 @@ public class GattStatusMachine {
                         || currentGattStatus == GATT_STATUS_SENDDING_DATA//v1.6
                         || currentGattStatus == GATT_STATUS_SENDDATA_SUCCESS//v1.7
                         || currentGattStatus == GATT_STATUS_DISCONNECTED//v1.7
+                        || currentGattStatus == GATT_STATUS_WAITTING_NOTIFY//允许超时断开
                         )
                     currentGattStatus = newStatus;
                 else
@@ -106,7 +108,22 @@ public class GattStatusMachine {
                         || currentGattStatus == GATT_STATUS_SERVICE_DISCOVERING
                         || currentGattStatus == GATT_STATUS_SENDDATA_FAILED
                         || currentGattStatus == GATT_STATUS_DISCONNECTTING
-                        || currentGattStatus == GATT_STATUS_CONNECTTING)
+                        || currentGattStatus == GATT_STATUS_CONNECTTING
+                        || currentGattStatus == GATT_STATUS_WAITTING_NOTIFY//允许超时断开
+                        )
+                    currentGattStatus = newStatus;
+                else
+                    isLegal = false;
+                break;
+            case GATT_STATUS_WAITTING_NOTIFY:
+                if (currentGattStatus == GATT_STATUS_SENDDATA_SUCCESS)
+                    currentGattStatus = newStatus;
+                else
+                    isLegal = false;
+                break;
+            case GATT_STATUS_NOTIFY_SUCCESS:
+            case GATT_STATUS_NOTIFY_FAILED:
+                if (currentGattStatus == GATT_STATUS_WAITTING_NOTIFY)
                     currentGattStatus = newStatus;
                 else
                     isLegal = false;
@@ -115,7 +132,7 @@ public class GattStatusMachine {
         XLog.d(TAG, "currentGattStatus = " + currentGattStatus);
         if (isLegal) {
             if (listener != null)
-                listener.onStatusChange(currentGattStatus);
+                listener.onStatusChange(currentGattStatus, attr);
             else {
                 XLog.d(TAG, "# listener is null ? why.");
             }

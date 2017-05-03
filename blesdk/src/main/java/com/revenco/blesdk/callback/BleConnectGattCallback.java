@@ -33,10 +33,13 @@ import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_CONNECTTING;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_DISCONNECTED;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_DISCONNECTTING;
+import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_FAILED;
+import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_SUCCESS;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_SENDDATA_FAILED;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_SENDDATA_SUCCESS;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_SERVICE_DISCOVERED;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_SERVICE_DISCOVERING;
+import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_WAITTING_NOTIFY;
 
 /**
  * Created by Administrator on 2016/11/11.
@@ -68,8 +71,8 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     private static final long DISCONNECT_INVAL = 500L;//断开间隔
     private static final int RE_DISCOVER_SERVICE_MAX = 3;//connectGatt.discoverServices() 为false时候，重试最大次数
     public static GattStatusEnum currentGattStatus = GATT_STATUS_DISCONNECTED;
-    public static volatile boolean isReceiveNotify = false;
-    public static volatile boolean isFinishSendData = false;
+//    public static volatile boolean isReceiveNotify = false;
+//    public static volatile boolean isFinishSendData = false;
     //写队列
     public static volatile boolean isWritting = false;
     /**
@@ -162,8 +165,8 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
      */
     public boolean canNewDeviceComeiin() {
         reDiscoveredServiceTime = 0;
-        isReceiveNotify = false;
-        isFinishSendData = false;
+//        isReceiveNotify = false;
+//        isFinishSendData = false;
         XLog.d(TAG, "canNewDeviceComeiin() called");
         currentGattStatus = GATT_STATUS_DISCONNECTED;//reset
         boolean connectting = GattStatusMachine.publicMachineStatus(listener, GATT_STATUS_CONNECTTING);
@@ -414,7 +417,8 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         stopReadRssi();
         //如果可以的话，先Reconnect，直到超过最大次数
         if (retry_gatt_reconnect < RETRY_CONNECT_MAX) {
-            if (isFinishSendData) {
+//            if (isFinishSendData) {
+            if (currentGattStatus == GATT_STATUS_WAITTING_NOTIFY) {
                 XLog.d(TAG, "数据发送完成!已经断开了连接，不判断 isReceiveNotify，connectGatt.safeCloseDB();");
                 closeAndRefresh();
             } else {
@@ -427,7 +431,8 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
                 XLog.d(TAG, "onConnectFailure  -> connectGatt.safeCloseDB()");
                 closeAndRefresh();
             }
-            if (!isFinishSendData) {//数据未发送完成
+//            if (!isFinishSendData) {//数据未发送完成
+            if (currentGattStatus != GATT_STATUS_WAITTING_NOTIFY) {//数据未发送完成
                 XLog.d(TAG, "onConnectFailure ->newGattReConnect()");
                 newGattReConnect();
             }
@@ -757,9 +762,11 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             XLog.d(TAG, string);
             XLog.d("show-result_timeout", string);
             NotifyHelper.getInstance().debuginfo(string);
-            if (!isReceiveNotify) {
+//            if (!isReceiveNotify) {
+            if (!(currentGattStatus == GATT_STATUS_NOTIFY_SUCCESS || currentGattStatus == GATT_STATUS_NOTIFY_FAILED)) {
+
                 XLog.e(TAG, "1 、 first receive notify!");
-                GattOperations.dealNotify(connectGatt, value, listener);
+                GattOperations.dealNotify(connectGatt, value);
             } else
                 XLog.e(TAG, "2 、 second receive notify!");
         }
@@ -873,12 +880,14 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
      */
     public void setTimeoutToStop() {
         reMoveAllMsgForTimeout();
-        if (isReceiveNotify) {
+//        if (isReceiveNotify) {
+        if (currentGattStatus == GATT_STATUS_NOTIFY_SUCCESS || currentGattStatus == GATT_STATUS_NOTIFY_FAILED) {
             XLog.d("result_timeout", "isReceiveNotify is true,return.");
             return;
         }
         //如果发送完成数据了，允许再等待100ms，等待notify，提高app开锁成功率，再执行timeout逻辑
-        if (currentGattStatus == GATT_STATUS_SENDDATA_SUCCESS && isFinishSendData) {
+//        if (currentGattStatus == GATT_STATUS_SENDDATA_SUCCESS && isFinishSendData) {
+        if (currentGattStatus == GATT_STATUS_WAITTING_NOTIFY) {
             XLog.w(TAG, "超时，但是发送数据完成，开始等待100ms------start");
             try {
                 Thread.sleep(100);
@@ -895,6 +904,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             if (connectGatt != null) {
                 XLog.d(TAG, "//已经连接上");
                 XLog.d("result_timeout", "connectGatt.disconnect();");
+                GattStatusMachine.publicMachineStatus(listener, GATT_STATUS_DISCONNECTTING);
                 connectGatt.disconnect();
             }
         } else {

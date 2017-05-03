@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static com.revenco.blesdk.callback.BleConnectGattCallback.isFinishSendData;
 import static com.revenco.blesdk.core.Config.WRITE_UUID1;
 import static com.revenco.blesdk.core.Config.WRITE_UUID2;
 import static com.revenco.blesdk.core.Config.WRITE_UUID3;
@@ -26,6 +25,7 @@ import static com.revenco.blesdk.core.Config.WRITE_UUID5;
 import static com.revenco.blesdk.core.Config.WRITE_UUID6;
 import static com.revenco.blesdk.core.Config.WRITE_UUID7;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_SENDDING_DATA;
+import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_WAITTING_NOTIFY;
 
 /**
  * <p>PROJECT : WeShare</p>
@@ -136,7 +136,8 @@ public class DataHelper {
             }
         } else {
             XLog.d(TAG, "mWrittingQueue is empty.");
-            isFinishSendData = true;
+//            isFinishSendData = true;
+            GattStatusMachine.publicMachineStatus(CallbackConnectHelper.getbleConnectGattCallback().getListener(),GATT_STATUS_WAITTING_NOTIFY);
         }
     }
 

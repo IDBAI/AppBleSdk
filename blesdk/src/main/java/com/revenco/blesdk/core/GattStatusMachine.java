@@ -8,6 +8,8 @@ import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_CONNECTTING;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_DISCONNECTED;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_DISCONNECTTING;
+import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_FAILED;
+import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_SUCCESS;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_SENDDATA_FAILED;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_SENDDATA_SUCCESS;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_SENDDING_DATA;
@@ -45,6 +47,8 @@ public class GattStatusMachine {
                         || currentGattStatus == GATT_STATUS_SENDDATA_SUCCESS//v1.7
                         || currentGattStatus == GATT_STATUS_DISCONNECTED//v1.7
                         || currentGattStatus == GATT_STATUS_WAITTING_NOTIFY//允许超时断开
+                        || currentGattStatus == GATT_STATUS_NOTIFY_SUCCESS//允许断开
+                        || currentGattStatus == GATT_STATUS_NOTIFY_FAILED//允许断开
                         )
                     currentGattStatus = newStatus;
                 else
@@ -110,6 +114,8 @@ public class GattStatusMachine {
                         || currentGattStatus == GATT_STATUS_DISCONNECTTING
                         || currentGattStatus == GATT_STATUS_CONNECTTING
                         || currentGattStatus == GATT_STATUS_WAITTING_NOTIFY//允许超时断开
+                        || currentGattStatus == GATT_STATUS_NOTIFY_SUCCESS//允许断开
+                        || currentGattStatus == GATT_STATUS_NOTIFY_FAILED//允许断开
                         )
                     currentGattStatus = newStatus;
                 else

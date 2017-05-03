@@ -8,6 +8,7 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
 
 import com.revenco.blesdk.core.Config;
 import com.revenco.blesdk.core.iBeaconManager;
@@ -130,8 +131,8 @@ public class CallbackConnectHelper {
      */
     public BluetoothGattCharacteristic getGattCharByConfigUUID(BluetoothGattService service, String uuid) {
         XLog.d(TAG, "getGattCharByConfigUUID() called ,uuid = " + uuid);
-        if (service == null) {
-            XLog.e(TAG, "service == null");
+        if (service == null || TextUtils.isEmpty(uuid)) {
+            XLog.e(TAG, "service == null || TextUtils.isEmpty(uuid)");
             return null;
         }
         BluetoothGattCharacteristic characteristic = service.getCharacteristic(UUID.fromString(uuid));

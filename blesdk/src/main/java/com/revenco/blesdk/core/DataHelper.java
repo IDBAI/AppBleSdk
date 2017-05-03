@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static com.revenco.blesdk.callback.BleConnectGattCallback.isFinishSendData;
 import static com.revenco.blesdk.core.Config.WRITE_UUID1;
 import static com.revenco.blesdk.core.Config.WRITE_UUID2;
 import static com.revenco.blesdk.core.Config.WRITE_UUID3;
@@ -136,7 +137,7 @@ public class DataHelper {
             }
         } else {
             XLog.d(TAG, "mWrittingQueue is empty.");
-//            isFinishSendData = true;
+            isFinishSendData = true;
             GattStatusMachine.publicMachineStatus(CallbackConnectHelper.getbleConnectGattCallback().getListener(),GATT_STATUS_WAITTING_NOTIFY);
         }
     }

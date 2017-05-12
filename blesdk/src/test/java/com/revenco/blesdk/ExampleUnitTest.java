@@ -120,6 +120,7 @@ public class ExampleUnitTest extends TestSuite {
         System.out.println(ConvertUtil.byteServiceUUID2string(CHAR_UUID_NOTYFY));
     }
 
+
     @Test
     public void testHttp() {
 //        HttpRequest httpRequest = new HttpRequest("http://www.baidu.com");

@@ -99,6 +99,8 @@ public class BleBluetooth {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (isTimeout)//4.8秒扫描超时，取消总超时计数
+                    return;
                 XLog.d("result_timeout", "run() called");
                 BleConnectGattCallback gattCallback = CallbackConnectHelper.getbleConnectGattCallback();
                 if (gattCallback != null) {

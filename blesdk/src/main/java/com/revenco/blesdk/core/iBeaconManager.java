@@ -344,7 +344,7 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
                 bean.scanTime = scanConsumeTime / 1000.0f;
                 bean.RSSI = rssiCount != 0 ? rssiTotal / rssiCount : -1;
                 Date date = new Date();
-                DateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH HH:mm:ss.sss");
+                DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.sss");
                 bean.currentDate = format.format(date).toString();
                 bean.openConsumeTime = openConsumeTime / 1000.0f;
                 bean.certificateIndex = -1;

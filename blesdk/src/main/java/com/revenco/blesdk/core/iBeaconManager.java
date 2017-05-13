@@ -1,5 +1,6 @@
 package com.revenco.blesdk.core;
 
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.le.ScanResult;
@@ -314,6 +315,11 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
         saveStatisticalData(OpenResult.result_timeout);
     }
 
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private void removeTotalTimer() {
+        bleBluetooth.removeTotalTimer();
+    }
+
     /**
      * 耗时操作
      *
@@ -321,6 +327,7 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
      * @param attr
      */
     private void saveStatisticalData(final OpenResult result, final String... attr) {
+        removeTotalTimer();
         XLog.d(TAG, "saveStatisticalData() called ");
         new Thread(new Runnable() {
             @Override

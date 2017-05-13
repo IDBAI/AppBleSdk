@@ -29,6 +29,39 @@ public class BleBluetooth {
     private BluetoothExceptionListener exceptionListener;
     private oniBeaconStatusListener optionListener;
     private volatile boolean isTimeout = false;
+    /**
+     * 总超时的计时器
+     */
+    private Runnable totalTimerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (isTimeout)//4.8秒扫描超时，取消总超时计数
+                return;
+            XLog.d("result_timeout", "run() called");
+            BleConnectGattCallback gattCallback = CallbackConnectHelper.getbleConnectGattCallback();
+            if (gattCallback != null) {
+                XLog.d("result_timeout", "gattCallback.setTimeoutToStop();");
+                gattCallback.setTimeoutToStop();
+            } else {
+                XLog.d("result_timeout", "gattCallback is null.");
+            }
+        }
+    };
+    /**
+     * 扫描计时器
+     */
+    private Runnable scanTimerRunnable = new Runnable() {
+        @Override
+        public void run() {
+            XLog.d("result_timeout", "first runnable.");
+            try {
+                if (isTimeout)
+                    stopScan(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    };
 
     public static synchronized BleBluetooth getInStance() {
         return INSTANCE;
@@ -83,34 +116,9 @@ public class BleBluetooth {
         }
         //扫描超时
         isTimeout = true;
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                XLog.d("result_timeout", "first runnable.");
-                try {
-                    if (isTimeout)
-                        stopScan(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }, scanPeriod);
+        handler.postDelayed(scanTimerRunnable, scanPeriod);
         //总超时
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (isTimeout)//4.8秒扫描超时，取消总超时计数
-                    return;
-                XLog.d("result_timeout", "run() called");
-                BleConnectGattCallback gattCallback = CallbackConnectHelper.getbleConnectGattCallback();
-                if (gattCallback != null) {
-                    XLog.d("result_timeout", "gattCallback.setTimeoutToStop();");
-                    gattCallback.setTimeoutToStop();
-                } else {
-                    XLog.d("result_timeout", "gattCallback is null.");
-                }
-            }
-        }, timeout);
+        handler.postDelayed(totalTimerRunnable, timeout);
     }
 
     /**
@@ -130,6 +138,17 @@ public class BleBluetooth {
         if (isTimout) {
             if (optionListener != null)
                 optionListener.timeout();
+        }
+    }
+
+    /**
+     * 移除总超时的计时器
+     */
+    public void removeTotalTimer() {
+        XLog.d(TAG, "removeTotalTimer() called ");
+        if (handler != null) {
+            handler.removeCallbacks(scanTimerRunnable);
+            handler.removeCallbacks(totalTimerRunnable);
         }
     }
 }

@@ -57,8 +57,6 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     private static final int MSG_COMMING_TIMEOUT = 108;
     //
     private static final int RETRY_READ_RSSI_MAX = 3;//读远程RSSI，最大重试次数
-    private static final int RETRY_CONNECT_MAX = 2;//connectGatt 直接重连，可尝试最大次数
-    private static final int RETRY_NEW_GATT_CONNECT_MAX = 9;//新建Gatt 重连，可尝试最大次数
     private static final int LOGIC_FAILED_RETRY_MAX = 2;//写入数据逻辑失败，可尝试最大次数
     private static final int RETRY_DISCOVER_SERVICE_MAX = 3;//发现服务超时，最大可尝试次数
     //
@@ -67,6 +65,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     private static final int RE_DISCOVERED_SERVICE_MAX = 3;
     private static final long DISCONNECT_INVAL = 500L;//断开间隔
     private static final int RE_DISCOVER_SERVICE_MAX = 3;//connectGatt.discoverServices() 为false时候，重试最大次数
+    private static final int RETRY_NEW_GATT_CONNECT_MAX = 9;//新建Gatt 重连，可尝试最大次数
     public static GattStatusEnum currentGattStatus = GATT_STATUS_DISCONNECTED;
     /**
      * 全局状态判断标识，非常重要
@@ -78,6 +77,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     public static volatile boolean isFinishSendData = false;
     //写队列
     public static volatile boolean isWritting = false;
+    private static int RETRY_CONNECT_MAX = 2;//connectGatt 直接重连，可尝试最大次数
     /**
      * 首次进来连接超时
      */
@@ -145,6 +145,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             NEW_GATT_CONNECT_TIMEOUT = 2000L;
             WAIT_SERVICE_DISCOVER_TIMEOUT = 2500L;
             WAIT_DISCONNECT_TIMEOUT = 1500L;
+            RETRY_CONNECT_MAX = 1;//connectGatt 直接重连，可尝试最大次数
         } else if (manufacturer.equalsIgnoreCase("Meizu")) {
             XLog.d(TAG, "针对魅族修改了超时配置");
             GATT_FIRST_CONNECT_TIMEOUT = 3600L;
@@ -152,12 +153,14 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             NEW_GATT_CONNECT_TIMEOUT = 2500L;
             WAIT_SERVICE_DISCOVER_TIMEOUT = 2500L;
             WAIT_DISCONNECT_TIMEOUT = 1500L;
+            RETRY_CONNECT_MAX = 1;//connectGatt 直接重连，可尝试最大次数
         } else {//默认配置
             GATT_FIRST_CONNECT_TIMEOUT = 1800L;
             GATT_RECONNECT_TIMEOUT = 1000L;
             NEW_GATT_CONNECT_TIMEOUT = 1500L;
             WAIT_SERVICE_DISCOVER_TIMEOUT = 1000L;
             WAIT_DISCONNECT_TIMEOUT = 1000L;
+            RETRY_CONNECT_MAX = 2;//connectGatt 直接重连，可尝试最大次数
         }
     }
 
@@ -764,9 +767,10 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             NotifyHelper.getInstance().debuginfo(string);
             if (!isReceiveNotify) {
                 XLog.e(TAG, "1 、 first receive notify!");
+                XLog.e("result_timeout", "1 、 first receive notify!");
                 GattOperations.dealNotify(connectGatt, value);
             } else
-                XLog.e(TAG, "2 、 second receive notify!");
+                XLog.e(TAG, "more 、 second receive notify!");
         }
     }
 

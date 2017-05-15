@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.os.Build;
+import android.os.Handler;
 
 import com.revenco.blesdk.callback.BleConnectGattCallback;
 import com.revenco.blesdk.callback.CallbackConnectHelper;
@@ -17,6 +18,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static com.revenco.blesdk.callback.BleConnectGattCallback.MSG_READ_RESULT;
+import static com.revenco.blesdk.callback.BleConnectGattCallback.WAIT_READ_RESULT_DELAY;
 import static com.revenco.blesdk.callback.BleConnectGattCallback.isFinishSendData;
 import static com.revenco.blesdk.core.Config.WRITE_UUID1;
 import static com.revenco.blesdk.core.Config.WRITE_UUID2;
@@ -126,19 +129,25 @@ public class DataHelper {
             return "";
     }
 
-    public synchronized void nextWrite(BluetoothGatt gatt) {
+    public synchronized void nextWrite(BluetoothGatt gatt, Handler mHandler) {
         if (!mWrittingQueue.isEmpty()) {
             XLog.d(TAG, "isWritting = " + BleConnectGattCallback.isWritting);
             if (BleConnectGattCallback.isWritting) {
                 XLog.d(TAG, "is Writting.");
             } else {
                 printWriteQueue();
-                doWrite(gatt, mWrittingQueue.poll());
+                doWrite(gatt, mWrittingQueue.poll(), mHandler);
             }
         } else {
             XLog.d(TAG, "mWrittingQueue is empty.");
             isFinishSendData = true;
-            GattStatusMachine.publicMachineStatus(CallbackConnectHelper.getbleConnectGattCallback().getListener(),GATT_STATUS_WAITTING_NOTIFY);
+            GattStatusMachine.publicMachineStatus(CallbackConnectHelper.getbleConnectGattCallback().getListener(), GATT_STATUS_WAITTING_NOTIFY);
+            if (mHandler != null) {
+                XLog.d("result_timeout", "设置了" + WAIT_READ_RESULT_DELAY + " ms 等待notify，否则主动读取状态!");
+                mHandler.sendEmptyMessageDelayed(MSG_READ_RESULT, WAIT_READ_RESULT_DELAY);
+            }else {
+                XLog.d("result_timeout", "mHandler == null !");
+            }
         }
     }
 
@@ -147,14 +156,14 @@ public class DataHelper {
         XLog.d(TAG, "mWrittingQueue size is " + mWrittingQueue.size());
     }
 
-    public synchronized void doWrite(BluetoothGatt gatt, Object o) {
+    public synchronized void doWrite(BluetoothGatt gatt, Object o, Handler mHandler) {
         XLog.d(TAG, "doWrite() called with:  o = [" + o + "]");
         if (o instanceof byte[]) {//队列写入特征值
             if (!GattStatusMachine.publicMachineStatus(CallbackConnectHelper.getbleConnectGattCallback().getListener(), GATT_STATUS_SENDDING_DATA))
                 return;
             writeBytes(gatt, (byte[]) o);
         } else {
-            nextWrite(gatt);
+            nextWrite(gatt, mHandler);
         }
     }
 

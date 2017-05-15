@@ -45,11 +45,11 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
     /**
      * 每一次扫描周期 4.8 秒扫描不到信号，返回超时失败
      */
-    private static final long SCAN_PERIOD = 4800;
+    private static long SCAN_PERIOD = 4800;
     /**
      * 超时
      */
-    private static final long TIMEOUT = 5500;
+    private static long TIMEOUT = 5500;
     private static iBeaconManager INSTANCE;
     /**
      * beacon 的mac地址
@@ -154,7 +154,22 @@ public class iBeaconManager implements BluetoothExceptionListener, oniBeaconStat
             return false;
         }
         isinitialize = true;
+        initParams();
         return true;
+    }
+
+    /**
+     * 初始化连接参数
+     */
+    private void initParams() {
+        String manufacturer = Build.MANUFACTURER;
+        if (manufacturer.equalsIgnoreCase("samsung")) {//三星
+            SCAN_PERIOD = 4800;
+            TIMEOUT = 7500;
+        } else {//默认配置
+            SCAN_PERIOD = 4800;
+            TIMEOUT = 5500;
+        }
     }
 
     private void initBleBroadCast() {

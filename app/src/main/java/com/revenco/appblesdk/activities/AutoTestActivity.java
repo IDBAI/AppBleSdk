@@ -45,6 +45,10 @@ public class AutoTestActivity extends AppCompatActivity implements oniBeaconStat
     private static final int PERMISSION_REQUEST_LIST = 100;
     private static final String TAG = "AutoTestActivity";
     private static final int STAT_COUNT = 5;//统计数据截取阈值
+    /**
+     * 自动测试间隔时间
+     */
+    private static final long PERIOD = 5 * 1000L;
     private Vibrator mVibrator;//手机震动
     private SoundPool mSoundPool;//摇一摇音效
     //记录摇动状态
@@ -212,7 +216,7 @@ public class AutoTestActivity extends AppCompatActivity implements oniBeaconStat
             }
         };
         timer = new Timer();
-        timer.schedule(task, new Date(), 10 * 1000L);
+        timer.schedule(task, new Date(), PERIOD);
     }
 
     private void autostartBleEntances() {

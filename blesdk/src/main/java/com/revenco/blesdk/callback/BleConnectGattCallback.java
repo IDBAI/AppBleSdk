@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.support.annotation.Nullable;
 
 import com.revenco.blesdk.bean.TransData;
 import com.revenco.blesdk.core.Config;
@@ -44,6 +45,8 @@ import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class BleConnectGattCallback extends BaseBleGattCallback implements bleCharacterCallback {
+    public static final int MSG_READ_RESULT = 110;
+    public static final long WAIT_READ_RESULT_DELAY = 100L;
     private static final String TAG = "BleConnectGattCallback";
     //
     private static final int MSG_WRITE_CHARACTERISTIC = 100;
@@ -274,6 +277,16 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
 //                                listener.result_timeout();
 //                        }
                         timeoutFailure(false);
+                        break;
+                    case MSG_READ_RESULT:
+//                        主动读取开锁状态
+                        BluetoothGattCharacteristic characteristic = getNotifyChar();
+                        if (characteristic == null)
+                            break;
+                        if (connectGatt != null) {
+                            XLog.e(TAG, "超过" + WAIT_READ_RESULT_DELAY + " ms 未接收到notify，主动读取开锁状态！");
+                            connectGatt.readCharacteristic(characteristic);
+                        }
                         break;
                 }
                 return false;
@@ -695,16 +708,9 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
      */
     private synchronized void startNotify(boolean enable) {
         XLog.d(TAG, "startNotify() called with: enable = [" + enable + "]");
-        BluetoothGattService service = CallbackConnectHelper.getInstance().getBluetoothGattService(connectGatt);
-        if (service == null) {
-            XLog.e(TAG, "    service is null");
+        BluetoothGattCharacteristic characteristic = getNotifyChar();
+        if (characteristic == null)
             return;
-        }
-        BluetoothGattCharacteristic characteristic = CallbackConnectHelper.getInstance().getGattCharByConfigUUID(service, Config.NOTIFY_UUID);
-        if (characteristic == null) {
-            XLog.e(TAG, "   characteristic is null");
-            return;
-        }
         List<BluetoothGattDescriptor> descriptorList = characteristic.getDescriptors();
         if (descriptorList != null && descriptorList.size() > 0) {
             for (BluetoothGattDescriptor desc : descriptorList)
@@ -717,10 +723,26 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
         }
     }
 
+    @Nullable
+    private BluetoothGattCharacteristic getNotifyChar() {
+        BluetoothGattService service = CallbackConnectHelper.getInstance().getBluetoothGattService(connectGatt);
+        if (service == null) {
+            XLog.e(TAG, "    service is null");
+            return null;
+        }
+        BluetoothGattCharacteristic characteristic = CallbackConnectHelper.getInstance().getGattCharByConfigUUID(service, Config.NOTIFY_UUID);
+        if (characteristic == null) {
+            XLog.e(TAG, "   characteristic is null");
+            return null;
+        }
+        return characteristic;
+    }
+
     @Override
     public synchronized void onCharacteristicRead(BluetoothGatt gatt1, BluetoothGattCharacteristic characteristic, int status) {
         super.onCharacteristicRead(gatt1, characteristic, status);
         XLog.d(TAG, "onCharacteristicRead() called with: connectGatt = [" + connectGatt + "], characteristic = [" + characteristic + "], status = [" + status + "]");
+        dealUnlockResult(characteristic, false);
     }
 
     @Override
@@ -742,13 +764,13 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             XLog.d(TAG, "CharacteristicUuid =" + characteristic.getUuid() + "  -> startWrite data result_success .");
             onWriteDataSuccess(connectGatt, characteristic);
             DataHelper.getInstance().setUUIDHasWrited(charUuid.toUpperCase());
-            DataHelper.getInstance().nextWrite(connectGatt);
+            DataHelper.getInstance().nextWrite(connectGatt, mHandler);
         } else {
             //写入失败，重试3次
             if (retry_logic_fail < LOGIC_FAILED_RETRY_MAX) {
                 retry_logic_fail++;
                 XLog.d(TAG, "onCharacteristicWrite logic result_failed,and retry it the " + retry_logic_fail + " times.");
-                DataHelper.getInstance().doWrite(connectGatt, characteristic);
+                DataHelper.getInstance().doWrite(connectGatt, characteristic,mHandler);
             } else
                 onWriteDataFailure(new GattException(connectGatt, status));
         }
@@ -758,16 +780,33 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
     public synchronized void onCharacteristicChanged(BluetoothGatt gatt1, BluetoothGattCharacteristic characteristic) {
         super.onCharacteristicChanged(gatt1, characteristic);
         XLog.d(TAG, "onCharacteristicChanged() called with: connectGatt = [" + connectGatt + "], characteristic = [" + characteristic + "]");
+        dealUnlockResult(characteristic, true);
+    }
+
+    /**
+     * 处理开锁结果
+     *
+     * @param characteristic
+     * @param isNotifyReceive
+     */
+    private void dealUnlockResult(BluetoothGattCharacteristic characteristic, boolean isNotifyReceive) {
+        XLog.d(TAG, "dealUnlockResult() called ");
         byte[] value = characteristic.getValue();
         if (value != null) {
             String hexStr = ConvertUtil.byte2HexStr(value);
-            String string = "onCharacteristicChanged -> charUuid = " + characteristic.getUuid().toString() + "   receive:" + hexStr;
+            String string = "  charUuid = " + characteristic.getUuid().toString() + "   receive:" + hexStr;
             XLog.d(TAG, string);
             XLog.d("show-result_timeout", string);
             NotifyHelper.getInstance().debuginfo(string);
+            removeGetResultMsg();
             if (!isReceiveNotify) {
-                XLog.e(TAG, "1 、 first receive notify!");
-                XLog.e("result_timeout", "1 、 first receive notify!");
+                if (isNotifyReceive) {
+                    XLog.e(TAG, "1 、 first receive notify!");
+                    XLog.e("result_timeout", "1 、 first receive notify!");
+                } else {
+                    XLog.e("result_timeout", "主动读取状态!");
+                    XLog.e(TAG, "主动读取状态!");
+                }
                 GattOperations.dealNotify(connectGatt, value);
             } else
                 XLog.e(TAG, "more 、 second receive notify!");
@@ -798,14 +837,14 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             if (!NotifyHelper.getInstance().isfinishset()) {
                 NotifyHelper.getInstance().setNextNotify(listener, connectGatt);
             } else {
-                DataHelper.getInstance().nextWrite(connectGatt);
+                DataHelper.getInstance().nextWrite(connectGatt, mHandler);
             }
         } else {
             //写入失败，重试3次
             if (retry_logic_fail < LOGIC_FAILED_RETRY_MAX) {
                 retry_logic_fail++;
                 XLog.d(TAG, "onDescriptorWrite logic result_failed,and retry it the " + retry_logic_fail + " times.");
-                DataHelper.getInstance().doWrite(connectGatt, descriptor);
+                DataHelper.getInstance().doWrite(connectGatt, descriptor,mHandler);
             } else
                 onWriteDataFailure(new GattException(connectGatt, status));
         }
@@ -881,6 +920,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
      * 断开连接，在onConnectFailed 中close 资源
      */
     public void setTimeoutToStop() {
+        removeGetResultMsg();
         reMoveAllMsgForTimeout();
         if (isReceiveNotify) {
             XLog.d("result_timeout", "isReceiveNotify is true,return.");
@@ -922,5 +962,10 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
                 listener.timeout();
             GattStatusMachine.publicMachineStatus(listener, GATT_STATUS_DISCONNECTED);
         }
+    }
+
+    private void removeGetResultMsg() {
+        if (mHandler != null)
+            mHandler.removeMessages(MSG_READ_RESULT);
     }
 }

@@ -7,7 +7,6 @@ import android.support.annotation.RequiresApi;
 import com.revenco.blesdk.callback.CallbackConnectHelper;
 import com.revenco.blesdk.utils.XLog;
 
-import static com.revenco.blesdk.callback.BleConnectGattCallback.isReceiveNotify;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_FAILED;
 import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_NOTIFY_SUCCESS;
 
@@ -51,7 +50,7 @@ public class GattOperations {
                 GattStatusMachine.publicMachineStatus(CallbackConnectHelper.getbleConnectGattCallback().getListener(), GATT_STATUS_NOTIFY_FAILED, "这里是失败原因");
                 break;
         }
-        isReceiveNotify = true;
+
         XLog.d(TAG, "处理通知操作 -->  gatt.disconnect();");
         gatt.disconnect();
     }

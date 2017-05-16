@@ -48,7 +48,7 @@ public class AutoTestActivity extends AppCompatActivity implements oniBeaconStat
     /**
      * 自动测试间隔时间
      */
-    private static final long PERIOD = 5 * 1000L;
+    private static final long PERIOD = 8 * 1000L;
     private Vibrator mVibrator;//手机震动
     private SoundPool mSoundPool;//摇一摇音效
     //记录摇动状态

@@ -42,10 +42,6 @@ import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_
 public class DataHelper {
     private static final String TAG = "DataHelper";
     private static final int SIZE = 20;
-    /**
-     * 发包间隔
-     */
-    private static final long SEND_INTERVAL = 10L;
     private static DataHelper instance;
     private Queue<Object> mWrittingQueue;
     private byte[] data = new byte[]{
@@ -185,7 +181,7 @@ public class DataHelper {
         }
         BleConnectGattCallback.isWritting = true;
         try {
-            Thread.sleep(SEND_INTERVAL);
+            Thread.sleep(Config.SEND_INTERVAL);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

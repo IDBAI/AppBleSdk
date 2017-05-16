@@ -17,7 +17,6 @@ public class Config {
     //通知的特征值uuid-------------start
     public static final String NOTIFY_UUID = "88888888-96E2-119E-9E11-E29688888888";
     //通知的特征值uuid-------------end
-
     //暂不需要！
     public static final String CHAR_DESC_UUID = "88888888-8888-8888-8888-888888888888";
     /**
@@ -25,4 +24,13 @@ public class Config {
      */
     public static final int CHAR_SIZE = 8;
 
+    ////////////////////////////////////////以下发包相关
+    /**
+     * 每个发包间隔
+     */
+    public static final long SEND_INTERVAL = 5L;
+    /**
+     * 发送数据之前间隔停留，用于等待更新参数成功
+     */
+    public static final long BEFORE_SEND_INTEVAL = 0L;
 }

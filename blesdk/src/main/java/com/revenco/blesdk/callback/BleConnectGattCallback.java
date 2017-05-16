@@ -46,7 +46,7 @@ import static com.revenco.blesdk.core.iBeaconManager.GattStatusEnum.GATT_STATUS_
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class BleConnectGattCallback extends BaseBleGattCallback implements bleCharacterCallback {
     public static final int MSG_READ_RESULT = 110;
-    public static final long WAIT_READ_RESULT_DELAY = 100L;
+    public static final long WAIT_READ_RESULT_DELAY = 200L;
     private static final String TAG = "BleConnectGattCallback";
     //
     private static final int MSG_WRITE_CHARACTERISTIC = 100;
@@ -638,6 +638,11 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
                 XLog.d(TAG, "services is empty.");
                 emptyReDiscoveredService();
             } else {
+                try {
+                    Thread.sleep(Config.BEFORE_SEND_INTEVAL);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 //先设置notify
                 startNotify(true);
                 //填充数据
@@ -770,7 +775,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             if (retry_logic_fail < LOGIC_FAILED_RETRY_MAX) {
                 retry_logic_fail++;
                 XLog.d(TAG, "onCharacteristicWrite logic result_failed,and retry it the " + retry_logic_fail + " times.");
-                DataHelper.getInstance().doWrite(connectGatt, characteristic,mHandler);
+                DataHelper.getInstance().doWrite(connectGatt, characteristic, mHandler);
             } else
                 onWriteDataFailure(new GattException(connectGatt, status));
         }
@@ -800,6 +805,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             NotifyHelper.getInstance().debuginfo(string);
             removeGetResultMsg();
             if (!isReceiveNotify) {
+                isReceiveNotify = true;
                 if (isNotifyReceive) {
                     XLog.e(TAG, "1 、 first receive notify!");
                     XLog.e("result_timeout", "1 、 first receive notify!");
@@ -808,8 +814,10 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
                     XLog.e(TAG, "主动读取状态!");
                 }
                 GattOperations.dealNotify(connectGatt, value);
-            } else
-                XLog.e(TAG, "more 、 second receive notify!");
+            } else {
+                XLog.e("result_timeout", "more 、 receive notify!");
+                XLog.e(TAG, "more 、 receive notify!");
+            }
         }
     }
 
@@ -844,7 +852,7 @@ public class BleConnectGattCallback extends BaseBleGattCallback implements bleCh
             if (retry_logic_fail < LOGIC_FAILED_RETRY_MAX) {
                 retry_logic_fail++;
                 XLog.d(TAG, "onDescriptorWrite logic result_failed,and retry it the " + retry_logic_fail + " times.");
-                DataHelper.getInstance().doWrite(connectGatt, descriptor,mHandler);
+                DataHelper.getInstance().doWrite(connectGatt, descriptor, mHandler);
             } else
                 onWriteDataFailure(new GattException(connectGatt, status));
         }
